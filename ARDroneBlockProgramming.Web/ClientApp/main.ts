@@ -5,7 +5,8 @@ import router from './router'
 
 import App from './App.vue';
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = true;
+Vue.config.devtools = true;
 
 
 new Vue({
