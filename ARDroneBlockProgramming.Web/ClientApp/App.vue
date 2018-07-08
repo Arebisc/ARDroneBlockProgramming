@@ -4,7 +4,7 @@
         <v-toolbar-title>Programowanie Blokowe Drona ARDrone</v-toolbar-title>
       </v-toolbar>
       <v-navigation-drawer app></v-navigation-drawer>
-      <v-content>
+      <v-content class="main-panel">
         <v-container fluid>
             <router-view></router-view>
         </v-container>
