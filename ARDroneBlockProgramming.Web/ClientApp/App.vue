@@ -1,7 +1,7 @@
 <template>
     <v-app>
       <v-toolbar app>
-        <v-toolbar-title>Programowanie Blockowe Drona ARDrone</v-toolbar-title>
+        <v-toolbar-title>Programowanie Blokowe Drona ARDrone</v-toolbar-title>
       </v-toolbar>
       <v-navigation-drawer app></v-navigation-drawer>
       <v-content>
