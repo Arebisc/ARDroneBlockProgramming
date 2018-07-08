@@ -1,41 +1,57 @@
 <template>
-    <div>
-        <h1>Home</h1>
-        <draggable v-model="listA" style="margin-bottom: 50px" :options="{ group: 'sample' }">
-            <div v-for="element in listA" :key="element.id">{{ element.name }}</div>
-        </draggable>
-        <draggable v-model="listB" :options="{ group: 'sample' }">
-            <div v-for="element in listB" :key="element.id">{{ element.name }}</div>
-        </draggable>
-    </div>
+    <v-layout row>
+        <v-flex xs4>
+            <h1>Akcje</h1>
+            <draggable v-model="droneActions" style="margin-bottom: 50px" :options="{ group: { name: 'drone-actions-group', pull:'clone' } }" class="actions-container">
+                <div v-for="(element, index) in droneActions" :key="index" class="action-tile">{{ element.actionLabel }}</div>
+            </draggable>
+        </v-flex>
+        <v-flex xs4>
+            <h1>Blok instrukcji do wykonania</h1>
+            <draggable v-model="userDefinedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions">
+                <div v-for="(element, index) in userDefinedActions" :key="index">{{ element.actionLabel }}</div>
+            </draggable>
+        </v-flex>
+    </v-layout>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
+import { DroneAction } from '../../classes/DroneAction';
 
 
 @Component({
     components: {
         draggable
-    }
+    },
 })
 export default class Home extends Vue {
-
-    listA: Array<object> = [
-            { id: 1, name: 'some'},
-            { id: 2, name: 'more'},
-            { id: 3, name: 'samples'},
+    droneActions: DroneAction[] = [
+            new DroneAction('UP'),
+            new DroneAction('DOWN'),
+            new DroneAction('Left'),
+            new DroneAction('Right')
         ];
 
-    listB: Array<object> = [
-            { id: 4, name: 'other'},
-            { id: 5, name: 'examples'},
-        ];
+    userDefinedActions: DroneAction[] = [];
 }
 </script>
 
 <style>
+.actions-containter {
+    width: 100%;
+}
 
+.action-tile {
+    width: 100%;
+    background: #ffffff;
+    height: 50px;
+    font-size: 18px;
+}
+
+.user-defined-actions {
+    min-height: 50px;
+}
 </style>
