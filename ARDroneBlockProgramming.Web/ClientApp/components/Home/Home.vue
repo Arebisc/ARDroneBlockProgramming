@@ -12,7 +12,7 @@
             <h1>Blok instrukcji do wykonania</h1>
             <h3>Początek</h3>
             <draggable v-model="userDefinedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions-contaner">
-                <action-tile v-for="(element, index) in userDefinedActions" :key="index" :droneAction="element"></action-tile>
+                <action-tile v-for="(element, index) in userDefinedActions" :key="index" :droneAction="element" :index="index"></action-tile>
             </draggable>
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
@@ -68,8 +68,8 @@ export default class Home extends Vue {
     userDefinedActions: DroneAction[] = [];
 
     valid: boolean = false;
-    speed: number = 0;
-    time: number = 0;
+    speed: number | null = null;
+    time: number | null = null;
 
     submitForm() {
         console.log('submitted');
