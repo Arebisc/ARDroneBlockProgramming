@@ -18,7 +18,8 @@ import { DroneAction } from '../../classes/DroneAction';
 
 @Component({
     props: {
-        droneAction: DroneAction
+        droneAction: DroneAction,
+        index: Number
     }
 })
 export default class Home extends Vue {
