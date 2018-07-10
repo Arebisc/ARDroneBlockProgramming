@@ -1,9 +1,12 @@
 <template>
     <v-layout row wrap class="action-tile">
-        <v-flex xs6>
+        <v-flex xs4>
             {{ droneAction.actionLabel }}
         </v-flex>
-        <v-flex xs6>
+        <v-flex xs4>
+            
+        </v-flex>
+        <v-flex xs4>
             <v-icon>remove_circle</v-icon>
         </v-flex>
     </v-layout>
