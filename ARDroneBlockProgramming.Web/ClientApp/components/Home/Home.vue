@@ -11,7 +11,7 @@
                 </action-tile>
             </draggable>
         </v-flex>
-        <v-flex xs4 class="user-defined-actions__wrapper">
+        <v-flex xs8 class="user-defined-actions__wrapper">
             <h1>Blok instrukcji do wykonania</h1>
             <h3>Początek</h3>
             <draggable v-model="userDefinedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions-contaner">
@@ -25,7 +25,7 @@
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
         </v-flex>
-        <v-flex xs4 class="actions-parameters__wrapper">
+        <!-- <v-flex xs4 class="actions-parameters__wrapper">
             <v-form v-model="valid">
                 <v-text-field
                     v-model="speed"
@@ -44,7 +44,7 @@
                     Wykonaj instrukcje na dronie
                     </v-btn>
             </v-form>
-        </v-flex>
+        </v-flex> -->
     </v-layout>
 </template>
 
