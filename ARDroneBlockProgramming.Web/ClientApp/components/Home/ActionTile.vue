@@ -23,7 +23,7 @@ import { DroneAction } from '../../classes/DroneAction';
 export default class Home extends Vue {
     @Prop(DroneAction) droneAction!: DroneAction;
     @Prop(Number) index!: Number;
-    @Prop([Array]) arrayContaining!: Array<DroneAction>;
+    @Prop(Array) arrayContaining!: Array<DroneAction>;
 
     handleRemove() :void {
         
