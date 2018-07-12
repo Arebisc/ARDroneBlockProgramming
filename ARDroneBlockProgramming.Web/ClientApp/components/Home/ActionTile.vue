@@ -22,11 +22,11 @@ import { DroneAction } from '../../classes/DroneAction';
 @Component
 export default class Home extends Vue {
     @Prop(DroneAction) droneAction!: DroneAction;
-    @Prop(Number) index!: Number;
+    @Prop(Number) index!: number;
     @Prop(Array) arrayContaining!: Array<DroneAction>;
 
     handleRemove() :void {
-
+        this.arrayContaining.splice(this.index, 1);
     }
 }
 </script>
