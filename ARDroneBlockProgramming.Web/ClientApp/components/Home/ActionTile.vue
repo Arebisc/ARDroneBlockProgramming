@@ -6,7 +6,7 @@
         <v-flex xs4>
             
         </v-flex>
-        <v-flex xs4>
+        <v-flex xs4 v-if="arrayContaining != null">
             <v-icon @click="handleRemove">remove_circle</v-icon>
         </v-flex>
     </v-layout>
@@ -26,7 +26,7 @@ export default class Home extends Vue {
     @Prop(Array) arrayContaining!: Array<DroneAction>;
 
     handleRemove() :void {
-        
+
     }
 }
 </script>
