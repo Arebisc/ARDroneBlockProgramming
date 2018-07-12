@@ -7,7 +7,7 @@
             
         </v-flex>
         <v-flex xs4>
-            <v-icon>remove_circle</v-icon>
+            <v-icon @click="handleRemove">remove_circle</v-icon>
         </v-flex>
     </v-layout>
 </template>
@@ -19,20 +19,21 @@ import draggable from 'vuedraggable';
 import { DroneAction } from '../../classes/DroneAction';
 
 
-@Component({
-    props: {
-        droneAction: DroneAction,
-        index: Number
-    }
-})
+@Component
 export default class Home extends Vue {
-    
+    @Prop(DroneAction) droneAction!: DroneAction;
+    @Prop(Number) index!: Number;
+    @Prop([Array]) arrayContaining!: Array<DroneAction>;
+
+    handleRemove() :void {
+        
+    }
 }
 </script>
 
 <style scoped>
 .action-tile {
-    width: 100%;
+    width: 107%;
     background: #f5f3f3;
     font-size: 18px;
     padding: 10px 5px 5px 10px;
