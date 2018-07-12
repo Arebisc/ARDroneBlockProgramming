@@ -54,6 +54,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 import { DroneAction } from '../../classes/DroneAction';
 import ActionTileComponent from './ActionTile.vue';
+import { ActionEnum } from './../../classes/ActionEnum';
 
 
 @Component({
@@ -65,12 +66,12 @@ import ActionTileComponent from './ActionTile.vue';
 export default class Home extends Vue {
 
     droneActions: DroneAction[] = [
-        new DroneAction('Do góry'),
-        new DroneAction('W dół'),
-        new DroneAction('W lewo'),
-        new DroneAction('W prawo'),
-        new DroneAction('Do przodu'),
-        new DroneAction('Do tyłu')
+        new DroneAction('Do góry', ActionEnum.Up),
+        new DroneAction('W dół', ActionEnum.Down),
+        new DroneAction('W lewo', ActionEnum.Left),
+        new DroneAction('W prawo', ActionEnum.Right),
+        new DroneAction('Do przodu', ActionEnum.Forward),
+        new DroneAction('Do tyłu', ActionEnum.Back)
     ];
 
     userDefinedActions: DroneAction[] = [];
