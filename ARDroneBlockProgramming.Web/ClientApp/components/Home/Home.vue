@@ -5,14 +5,22 @@
             <draggable v-model="droneActions" style="margin-bottom: 50px" :options="{ 
                 group: { name: 'drone-actions-group', pull:'clone', put:false }, sort: false }"
                 class="actions-container">
-                <action-tile v-for="(element, index) in droneActions" :key="index" :drone-action="element"></action-tile>
+                <action-tile v-for="(element, index) in droneActions"
+                    :key="index"
+                    :drone-action="element">
+                </action-tile>
             </draggable>
         </v-flex>
         <v-flex xs4 class="user-defined-actions__wrapper">
             <h1>Blok instrukcji do wykonania</h1>
             <h3>Początek</h3>
             <draggable v-model="userDefinedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions-contaner">
-                <action-tile v-for="(element, index) in userDefinedActions" :key="index" :droneAction="element" :index="index" :arrayContaining="userDefinedActions"></action-tile>
+                <action-tile v-for="(element, index) in userDefinedActions" 
+                    :key="index" 
+                    :droneAction="element"
+                    :index="index"
+                    :arrayContaining="userDefinedActions">
+                </action-tile>
             </draggable>
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
