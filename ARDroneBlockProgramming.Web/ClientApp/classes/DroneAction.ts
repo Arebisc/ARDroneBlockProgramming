@@ -1,15 +1,15 @@
-import { ActionEnum } from './ActionEnum';
+import { ActionType } from '../Types/ActionType';
 
 
 export class DroneAction {
     public actionLabel: string;
-    public actionEnum: ActionEnum;
+    public actionType: ActionType;
     public speed: number | null;
     public duration: number | null;
 
-    public constructor(actionLabel: string, actionEnum: ActionEnum) {
+    public constructor(actionLabel: string, actionType: ActionType) {
         this.actionLabel = actionLabel;
-        this.actionEnum = actionEnum;
+        this.actionType = actionType;
         this.speed = null;
         this.duration = null;
     }
