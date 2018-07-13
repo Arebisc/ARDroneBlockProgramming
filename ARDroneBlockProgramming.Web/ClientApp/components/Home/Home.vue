@@ -25,26 +25,6 @@
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
         </v-flex>
-        <!-- <v-flex xs4 class="actions-parameters__wrapper">
-            <v-form v-model="valid">
-                <v-text-field
-                    v-model="speed"
-                    label="Prędkość z jaką będą wykonywane akcje"
-                    required
-                ></v-text-field>
-                <v-text-field
-                    v-model="time"
-                    label="Czas trwania każdej akcji"
-                    required
-                ></v-text-field>
-                    <v-btn
-                        :disabled="!valid"
-                        @click="submitForm"
-                    >
-                    Wykonaj instrukcje na dronie
-                    </v-btn>
-            </v-form>
-        </v-flex> -->
     </v-layout>
 </template>
 
@@ -77,8 +57,6 @@ export default class Home extends Vue {
     userDefinedActions: DroneAction[] = [];
 
     valid: boolean = false;
-    speed: number | null = null;
-    time: number | null = null;
 
     submitForm() {
         console.log('submitted');
