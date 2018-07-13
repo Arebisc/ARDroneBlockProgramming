@@ -1,4 +1,4 @@
-export enum ActionEnum {
+export enum ActionType {
     Up,
     Down,
     Left,
