@@ -11,13 +11,13 @@
             </v-flex>
             <v-flex xs8>
                 <v-text-field
-                    v-model="speed"
+                    v-model="droneAction.speed"
                     label="Prędkość"
                     required
                     class="params-input"
                 ></v-text-field>
                 <v-text-field
-                    v-model="time"
+                    v-model="droneAction.time"
                     label="Czas trwania"
                     required
                     class="params-input"
@@ -42,9 +42,6 @@ export default class Home extends Vue {
     @Prop(DroneAction) droneAction!: DroneAction;
     @Prop(Number) index!: number;
     @Prop(Array) arrayContaining!: Array<DroneAction>;
-
-    speed!: number | null;
-    time!: number | null;
 
     handleRemove() :void {
         this.arrayContaining.splice(this.index, 1);
