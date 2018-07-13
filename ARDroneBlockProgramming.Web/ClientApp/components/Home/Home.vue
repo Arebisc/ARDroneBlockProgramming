@@ -3,7 +3,7 @@
         <v-flex xs4 class="actions__wrapper">
             <h1 class="actions-header">Akcje</h1>
             <draggable v-model="droneActions" style="margin-bottom: 50px" :options="actionsContainerOptions"
-                class="actions-container">
+                class="actions-container" :clone="customClone">
                 <action-tile v-for="(element, index) in droneActions"
                     :key="index"
                     :drone-action="element">
@@ -61,10 +61,11 @@ export default class Home extends Vue {
         new DroneAction('Do przodu', ActionType.Forward),
         new DroneAction('Do tyłu', ActionType.Back)
     ];
-
     userDefinedActions: DroneAction[] = [];
 
-    valid: boolean = false;
+    customClone(originalAction: DroneAction): DroneAction {
+        return new DroneAction(originalAction.actionLabel, originalAction.actionType, originalAction.speed, originalAction.duration);
+    }
 
     submitForm() {
         console.log('submitted');
