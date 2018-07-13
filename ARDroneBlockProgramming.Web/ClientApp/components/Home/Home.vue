@@ -2,8 +2,7 @@
     <v-layout row>
         <v-flex xs4 class="actions__wrapper">
             <h1 class="actions-header">Akcje</h1>
-            <draggable v-model="droneActions" style="margin-bottom: 50px" :options="{ 
-                group: { name: 'drone-actions-group', pull:'clone', put:false }, sort: false }"
+            <draggable v-model="droneActions" style="margin-bottom: 50px" :options="actionsContainerOptions"
                 class="actions-container">
                 <action-tile v-for="(element, index) in droneActions"
                     :key="index"
@@ -44,6 +43,15 @@ import { ActionType } from './../../types/ActionType';
     }
 })
 export default class Home extends Vue {
+
+    actionsContainerOptions  = {
+        group: {
+            name: 'drone-actions-group',
+            pull:'clone',
+            put:false 
+        },
+        sort: false
+    };
 
     droneActions: DroneAction[] = [
         new DroneAction('Do góry', ActionType.Up),
