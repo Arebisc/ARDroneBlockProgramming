@@ -114,7 +114,10 @@ module.exports = (env) => {
                 filename: '[file].map', // Remove this line if you prefer inline source maps
                 moduleFilenameTemplate: path.relative(bundleOutputDir, '[resourcePath]'), // Point sourcemap entries to the original file locations on disk
             }),
-            new UglifyJsPlugin(),
+            // new UglifyJsPlugin({
+            //     sourceMap: false,
+            //     mangle: false
+            // }),
             new ExtractTextPlugin('site.css')
         ])
     },
