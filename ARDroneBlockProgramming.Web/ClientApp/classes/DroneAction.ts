@@ -15,7 +15,14 @@ export class DroneAction {
     ) {
         this.actionLabel = actionLabel;
         this.actionType = actionType;
-        this.speed = speed;
-        this.duration = duration;
+        this.speed = 0.1;
+        this.duration = 1000;
+
+        if(speed != null){
+            this.speed = speed;
+        }
+        if(duration != null){
+            this.duration = duration;
+        }
     }
 }

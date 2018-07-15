@@ -17,7 +17,7 @@
                     class="params-input"
                 ></v-text-field>
                 <v-text-field
-                    v-model="droneAction.time"
+                    v-model="droneAction.duration"
                     label="Czas trwania"
                     required
                     class="params-input"
@@ -33,7 +33,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
 import { DroneAction } from '../../classes/DroneAction';
 
 
