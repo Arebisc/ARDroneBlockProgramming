@@ -48,8 +48,8 @@ export default class Home extends Vue {
     actionsContainerOptions = {
         group: {
             name: 'drone-actions-group',
-            pull:'clone',
-            put:false 
+            pull: 'clone',
+            put: false 
         },
         sort: false
     };
