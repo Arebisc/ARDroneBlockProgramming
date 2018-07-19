@@ -1,9 +1,9 @@
 import { ManagerState } from './ManagerState';
 import Vuex from "vuex";
 import Vue from "vue";
-import mutations from './Mutations';
-import actions from './Actions';
-import getters from './Getters';
+import mutations from './mutations';
+import actions from './actions';
+import getters from './getters';
 
 Vue.use(Vuex);
 
