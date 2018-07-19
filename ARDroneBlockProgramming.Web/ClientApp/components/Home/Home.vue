@@ -69,8 +69,7 @@ export default class Home extends Vue {
     }
 
     async submitForm() {
-        let response = await this.$store.dispatch('sendActionsToAPI');
-        console.log('here');
+        let response = await this.$store.dispatch('sendActionsToAPI', this.userDefinedActions);
     }
 }
 </script>
