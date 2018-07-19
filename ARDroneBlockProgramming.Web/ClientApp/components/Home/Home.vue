@@ -35,6 +35,7 @@ import draggable from 'vuedraggable';
 import { DroneAction } from '../../classes/DroneAction';
 import ActionTileComponent from './ActionTile.vue';
 import { ActionType } from './../../types/ActionType';
+import { AxiosResponse } from 'axios';
 
 
 @Component({
@@ -69,7 +70,17 @@ export default class Home extends Vue {
     }
 
     async submitForm() {
-        let response = await this.$store.dispatch('sendActionsToAPI', this.userDefinedActions);
+        try {
+            let response = await this.$store.dispatch('sendActionsToAPI', this.userDefinedActions) as AxiosResponse;
+
+            if(response.status == 200) {
+                console.log('everything fine');
+                console.log(response.data);
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 }
 </script>
