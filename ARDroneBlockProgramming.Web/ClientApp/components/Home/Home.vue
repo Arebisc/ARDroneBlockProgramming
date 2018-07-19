@@ -23,6 +23,7 @@
             </draggable>
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
+            <v-btn type="button" @click="submitForm" color="info">Wykonaj akcje</v-btn>
         </v-flex>
     </v-layout>
 </template>
@@ -44,7 +45,7 @@ import { ActionType } from './../../types/ActionType';
 })
 export default class Home extends Vue {
 
-    actionsContainerOptions  = {
+    actionsContainerOptions = {
         group: {
             name: 'drone-actions-group',
             pull:'clone',
@@ -69,6 +70,11 @@ export default class Home extends Vue {
 
     submitForm() {
         console.log('submitted');
+
+        this.$store.dispatch('sendActionsToAPI')
+        .then((response) => {
+            console.log(response);
+        });
     }
 }
 </script>
