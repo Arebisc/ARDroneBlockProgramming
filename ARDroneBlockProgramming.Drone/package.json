@@ -7,7 +7,17 @@
     "name": "Michał Sibera"
   },
   "devDependencies": {
+    "@types/express": "^4.16.0",
     "@types/node": "^6.0.87"
   },
-  "dependencies": { }
+  "dependencies": {
+    "express": "^4.16.3",
+    "nodemon": "^1.18.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node ./src/main.ts",        
+    "start": "nodemon ./build/main.js",
+    "prod": "npm run build && npm run start"
+  }
 }
