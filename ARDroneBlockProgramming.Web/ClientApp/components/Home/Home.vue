@@ -68,13 +68,9 @@ export default class Home extends Vue {
         return new DroneAction(originalAction.actionLabel, originalAction.actionType, originalAction.speed, originalAction.duration);
     }
 
-    submitForm() {
-        console.log('submitted');
-
-        this.$store.dispatch('sendActionsToAPI')
-        .then((response) => {
-            console.log(response);
-        });
+    async submitForm() {
+        let response = await this.$store.dispatch('sendActionsToAPI');
+        console.log('here');
     }
 }
 </script>

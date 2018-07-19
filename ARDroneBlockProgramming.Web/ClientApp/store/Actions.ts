@@ -5,8 +5,10 @@ import { ManagerState } from './ManagerState';
 const actions: ActionTree<ManagerState, ManagerState> = {
     sendActionsToAPI({commit}): Promise<String> {
         return new Promise((resolve, reject) => {
-            console.log('dispatched');
-            resolve("something happen!");
+            setTimeout(() => {
+                console.log('dispatched');
+                resolve("something happen!");
+            }, 3000);
         });
     }
 }
