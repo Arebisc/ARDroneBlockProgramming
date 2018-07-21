@@ -13,6 +13,8 @@ namespace ARDroneBlockProgramming.Web.Controllers
         [HttpPost]
         public IActionResult Index([FromBody]DroneActionViewModel[] droneActionViewModel)
         {
+
+
             return Ok(droneActionViewModel);
         }
     }
