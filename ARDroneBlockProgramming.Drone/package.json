@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "ARDroneBlockProgramming.Drone",
   "main": "app.js",
+  "typings": "@types",
   "author": {
     "name": "Michał Sibera"
   },
@@ -11,12 +12,13 @@
     "@types/node": "^6.0.87"
   },
   "dependencies": {
+    "ar-drone": "^0.3.3",
     "express": "^4.16.3",
     "nodemon": "^1.18.3"
   },
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node ./src/main.ts",        
+    "dev": "ts-node ./src/main.ts",
     "start": "nodemon ./build/main.js",
     "prod": "npm run build && npm run start"
   }
