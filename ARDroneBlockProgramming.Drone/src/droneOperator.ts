@@ -15,16 +15,14 @@ export class DroneOperator {
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
         console.log('runActions');
         await this.takeOff();
+        console.log('after takeoff');
 
         return new Promise<boolean>(async (resolve, reject) => {
             console.log('droneActions: ' + droneActions.length);
 
-            // droneActions.forEach(async (action, index) => {
-            //     console.log(action);
-            //     await this.runAction(action);
-            // });
             for (let i: number = 0; i < droneActions.length; i++ ) {
                 await this.runAction(droneActions[i]);
+                await this.stop();
             }
             console.log('outside foreach')
 
@@ -39,12 +37,52 @@ export class DroneOperator {
         switch(action.actionType) {
             case ActionType.Forward:
                 await this.forward(action);
-                console.log('awaited action');
+                console.log('awaited forward');
             break;
             
             case ActionType.Back:
                 await this.back(action);
-                console.log('awaited action');
+                console.log('awaited back');
+            break;
+
+            case ActionType.Left:
+                await this.left(action);
+                console.log('awaited left');
+            break;
+
+            case ActionType.Right:
+                await this.right(action);
+                console.log('awaited right');
+            break;
+
+            case ActionType.Up:
+                await this.up(action);
+                console.log('awaited up');
+            break;
+
+            case ActionType.Down:
+                await this.down(action);
+                console.log('awaited down');
+            break;
+
+            case ActionType.Left:
+                await this.turnLeft(action);
+                console.log('awaited left');
+            break;
+
+            case ActionType.Right:
+                await this.turnRight(action);
+                console.log('awaited right');
+            break;
+
+            case ActionType.TurnLeft:
+                await this.turnLeft(action);
+                console.log('awaited turnLeft');
+            break;
+
+            case ActionType.TurnRight:
+                await this.turnRight(action);
+                console.log('awaited turnRight');
             break;
         }
 
@@ -53,35 +91,95 @@ export class DroneOperator {
 
     private async forward(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.front(action.speed);
             this._client.after(action.duration, () => {
                 console.log('forward');
-                this._client.front(action.speed);
                 resolve(this._client);
             });
-        })
+        });
+    }
+
+    private async left(action: DroneAction): Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.left(action.speed);
+            this._client.after(action.duration, () => {
+                console.log('left');
+                resolve(this._client);
+            });
+        });
+    }
+
+    private async right(action: DroneAction): Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.right(action.speed);
+            this._client.after(action.duration, () => {
+                console.log('right');
+                resolve(this._client);
+            });
+        });
+    }
+
+    private async up(action: DroneAction): Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.up(action.speed);
+            this._client.after(action.duration, () => {
+                console.log('up');
+                resolve(this._client);
+            });
+        });
+    }
+
+    private async down(action: DroneAction): Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.down(action.speed);
+            this._client.after(action.duration, () => {
+                console.log('down');
+                resolve(this._client);
+            });
+        });
     }
 
     private async back(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.back(action.speed);
             this._client.after(action.duration, () => {
                 console.log('back');
-                this._client.back(action.speed);
                 resolve(this._client);
             });
-        })
+        });
+    }
+
+    private async turnRight(action: DroneAction): Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.clockwise(action.speed);
+            this._client.after(action.duration, () => {
+                console.log('turnRight');
+                resolve(this._client);
+            });
+        });
+    }
+
+    private async turnLeft(action: DroneAction): Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.counterClockwise(action.speed);
+            this._client.after(action.duration, () => {
+                console.log('turnLeft');
+                resolve(this._client);
+            });
+        });
     }
 
     private async stop() : Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            this._client.stop();
             this._client.after(0, () => {
                 console.log('stop');
-                this._client.stop();
                 resolve(this._client);
             });
-        })
+        });
     }
 
-    private async takeOff(delay: number = 5000): Promise<arDrone.Client> {
+    private async takeOff(delay: number = 3000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             this._client.takeoff(() => {
                 console.log('takeoff');
@@ -101,10 +199,3 @@ export class DroneOperator {
         });
     }
 }
-
-const droneOperator = new DroneOperator();
-
-const actions = new Array<DroneAction>();
-actions.push(new DroneAction("Forward", ActionType.Forward, 0.1, 4000));
-actions.push(new DroneAction("Back", ActionType.Back, 0.1, 3000));
-droneOperator.runActions(actions);
