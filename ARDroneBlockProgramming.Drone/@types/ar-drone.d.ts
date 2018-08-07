@@ -200,7 +200,7 @@ declare module 'ar-drone' {
         }
 
         namespace PngEncoder {
-            namespace prototype {
+            // namespace prototype {
                 const domain: any;
 
                 function addListener(type: any, listener: any): any;
@@ -331,7 +331,7 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
@@ -355,7 +355,7 @@ declare module 'ar-drone' {
             }
 
             namespace PngEncoder {
-                namespace prototype {
+                // namespace prototype {
                     // Too-deep object hierarchy from ar_drone.Client.PngStream.PngEncoder.prototype
                     const addListener: any;
 
@@ -407,12 +407,12 @@ declare module 'ar-drone' {
                     // Too-deep object hierarchy from ar_drone.Client.PngStream.PngEncoder.prototype
                     const write: any;
 
-                }
+                // }
 
             }
 
             namespace TcpVideoStream {
-                namespace prototype {
+                // namespace prototype {
                     // Too-deep object hierarchy from ar_drone.Client.PngStream.TcpVideoStream.prototype
                     const addListener: any;
 
@@ -464,11 +464,11 @@ declare module 'ar-drone' {
                     // Too-deep object hierarchy from ar_drone.Client.PngStream.TcpVideoStream.prototype
                     const setMaxListeners: any;
 
-                }
+                // }
 
             }
 
-            namespace prototype {
+            // namespace prototype {
                 const domain: any;
 
                 function addListener(type: any, listener: any): any;
@@ -591,12 +591,12 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
         namespace Repl {
-            namespace prototype {
+            // namespace prototype {
                 function resume(): void;
 
                 namespace resume {
@@ -605,12 +605,12 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
         namespace TcpVideoStream {
-            namespace prototype {
+            // namespace prototype {
                 const domain: any;
 
                 function addListener(type: any, listener: any): any;
@@ -741,12 +741,12 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
         namespace UdpControl {
-            namespace prototype {
+            // namespace prototype {
                 function ack(): void;
 
                 function ackReset(): void;
@@ -851,12 +851,12 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
         namespace UdpNavdataStream {
-            namespace prototype {
+            // namespace prototype {
                 const domain: any;
 
                 function addListener(type: any, listener: any): any;
@@ -987,11 +987,11 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
-        namespace prototype {
+        // namespace prototype {
             const domain: any;
 
             function addListener(type: any, listener: any): any;
@@ -1298,7 +1298,7 @@ declare module 'ar-drone' {
 
             }
 
-        }
+        // }
 
     }
 
@@ -1322,7 +1322,7 @@ declare module 'ar-drone' {
         }
 
         namespace PngEncoder {
-            namespace prototype {
+            // namespace prototype {
                 const domain: any;
 
                 function addListener(type: any, listener: any): any;
@@ -1453,12 +1453,12 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
         namespace TcpVideoStream {
-            namespace prototype {
+            // namespace prototype {
                 const domain: any;
 
                 function addListener(type: any, listener: any): any;
@@ -1589,11 +1589,11 @@ declare module 'ar-drone' {
 
                 }
 
-            }
+            // }
 
         }
 
-        namespace prototype {
+        // namespace prototype {
             const domain: any;
 
             function addListener(type: any, listener: any): any;
@@ -1716,12 +1716,12 @@ declare module 'ar-drone' {
 
             }
 
-        }
+        // }
 
     }
 
     export namespace UdpControl {
-        namespace prototype {
+        // namespace prototype {
             function ack(): void;
 
             function ackReset(): void;
@@ -1826,12 +1826,12 @@ declare module 'ar-drone' {
 
             }
 
-        }
+        // }
 
     }
 
     export namespace UdpNavdataStream {
-        namespace prototype {
+        // namespace prototype {
             const domain: any;
 
             function addListener(type: any, listener: any): any;
@@ -1962,7 +1962,7 @@ declare module 'ar-drone' {
 
             }
 
-        }
+        // }
 
     }
 
