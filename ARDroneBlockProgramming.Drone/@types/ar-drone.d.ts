@@ -2,6 +2,21 @@
 declare module 'ar-drone' {
 
     export class Client {
+        public _udpNavdatasStream: UdpNavdataStream;
+        public _options: any;
+        public _udpControl: UdpControl;
+        public _pngStream: PngStream;
+        public _tcpVideoStream: any;
+        public _ref: any;
+        public _interval: any;
+        public _pcmd: any;
+        public _repeaters: any;
+        public _afterOffset: any;
+        public _disableEmergency: any;
+        public _lastState: any;
+        public _lastBattery: any;
+        public _lastAltitude: any;
+
         constructor(options: any);
 
         after(duration: any, fn: any): any;
