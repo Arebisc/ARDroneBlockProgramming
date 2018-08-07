@@ -10,6 +10,7 @@ export class DroneOperator {
         this._client = arDrone.createClient({
             ip: droneIp
         });
+        console.log(this._client);
     }
 
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
@@ -22,13 +23,20 @@ export class DroneOperator {
 
             for (let i: number = 0; i < droneActions.length; i++ ) {
                 await this.runAction(droneActions[i]);
-                await this.stop();
             }
             console.log('outside foreach')
 
             await this.land();
+            await this.stop();
+
+            this.closeConnections();
             resolve(true);
         });
+    }
+
+    private closeConnections(): void {
+        this._client._udpNavdatasStream.destroy();
+        this._client._udpControl.close();
     }
 
     private async runAction(action: DroneAction) {
@@ -91,9 +99,9 @@ export class DroneOperator {
 
     private async forward(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('forward');
             this._client.front(action.speed);
             this._client.after(action.duration, () => {
-                console.log('forward');
                 resolve(this._client);
             });
         });
@@ -101,9 +109,9 @@ export class DroneOperator {
 
     private async left(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('left');
             this._client.left(action.speed);
             this._client.after(action.duration, () => {
-                console.log('left');
                 resolve(this._client);
             });
         });
@@ -111,9 +119,9 @@ export class DroneOperator {
 
     private async right(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('right');
             this._client.right(action.speed);
             this._client.after(action.duration, () => {
-                console.log('right');
                 resolve(this._client);
             });
         });
@@ -121,9 +129,9 @@ export class DroneOperator {
 
     private async up(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('up');
             this._client.up(action.speed);
             this._client.after(action.duration, () => {
-                console.log('up');
                 resolve(this._client);
             });
         });
@@ -131,9 +139,9 @@ export class DroneOperator {
 
     private async down(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('down');
             this._client.down(action.speed);
             this._client.after(action.duration, () => {
-                console.log('down');
                 resolve(this._client);
             });
         });
@@ -141,9 +149,9 @@ export class DroneOperator {
 
     private async back(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('back');
             this._client.back(action.speed);
             this._client.after(action.duration, () => {
-                console.log('back');
                 resolve(this._client);
             });
         });
@@ -151,9 +159,9 @@ export class DroneOperator {
 
     private async turnRight(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('turnRight');
             this._client.clockwise(action.speed);
             this._client.after(action.duration, () => {
-                console.log('turnRight');
                 resolve(this._client);
             });
         });
@@ -161,9 +169,9 @@ export class DroneOperator {
 
     private async turnLeft(action: DroneAction): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('turnLeft');
             this._client.counterClockwise(action.speed);
             this._client.after(action.duration, () => {
-                console.log('turnLeft');
                 resolve(this._client);
             });
         });
@@ -171,9 +179,9 @@ export class DroneOperator {
 
     private async stop() : Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('stop');
             this._client.stop();
             this._client.after(0, () => {
-                console.log('stop');
                 resolve(this._client);
             });
         });
@@ -181,8 +189,8 @@ export class DroneOperator {
 
     private async takeOff(delay: number = 3000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('takeoff');
             this._client.takeoff(() => {
-                console.log('takeoff');
                 setTimeout(() => {
                     resolve(this._client);
                 }, delay);
@@ -192,10 +200,14 @@ export class DroneOperator {
 
     private async land(): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('land');
             this._client.land(() => {
-                console.log('land');
                 resolve(this._client);
             });
         });
     }
 }
+
+let droneOperator = new DroneOperator();
+let actions = new Array<DroneAction>();
+// droneOperator.runActions(actions);
