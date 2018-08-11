@@ -12,6 +12,8 @@ namespace ARDroneBlockProgramming.Web.Types
         Left = 2,
         Right = 3,
         Forward = 4,
-        Back = 5
+        Back = 5,
+        TurnRight = 6,
+        TurnLeft = 7
     }
 }
