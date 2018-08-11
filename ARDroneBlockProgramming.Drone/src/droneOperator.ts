@@ -15,28 +15,35 @@ export class DroneOperator {
 
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
         console.log('runActions');
+        this.reset();
         await this.takeOff();
-        console.log('after takeoff');
+        await this.stop();
 
         return new Promise<boolean>(async (resolve, reject) => {
+            
+            console.log('after takeoff');
+
             console.log('droneActions: ' + droneActions.length);
 
             for (let i: number = 0; i < droneActions.length; i++ ) {
                 await this.runAction(droneActions[i]);
+                await this.stop();
             }
-            console.log('outside foreach')
+            console.log('outside foreach');
 
             await this.land();
             await this.stop();
 
-            this.closeConnections();
+            this.reset();
             resolve(true);
         });
     }
 
-    private closeConnections(): void {
-        this._client._udpNavdatasStream.destroy();
-        this._client._udpControl.close();
+    private reset(): void {
+        console.log('reset');
+        // this._client._udpNavdatasStream.destroy();
+        // this._client._udpControl.close();
+        this._client.disableEmergency();
     }
 
     private async runAction(action: DroneAction) {
@@ -191,7 +198,9 @@ export class DroneOperator {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('takeoff');
             this._client.takeoff(() => {
+                console.log('aftertk');
                 setTimeout(() => {
+                    console.log('inside timeout');
                     resolve(this._client);
                 }, delay);
             });
@@ -206,8 +215,14 @@ export class DroneOperator {
             });
         });
     }
-}
 
-let droneOperator = new DroneOperator();
-let actions = new Array<DroneAction>();
-// droneOperator.runActions(actions);
+    public async wait(timeInMiliseconds: number) : Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            console.log('wait');
+            setTimeout(() => {
+                console.log('waited');
+                resolve(this._client);
+            }, timeInMiliseconds);
+        });
+    }
+}
