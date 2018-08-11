@@ -216,7 +216,7 @@ export class DroneOperator {
         });
     }
 
-    public async wait(timeInMiliseconds: number) : Promise<arDrone.Client> {
+    private async wait(timeInMiliseconds: number) : Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('wait');
             setTimeout(() => {
