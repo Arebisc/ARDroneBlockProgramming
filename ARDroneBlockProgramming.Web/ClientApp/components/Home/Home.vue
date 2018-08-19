@@ -13,12 +13,12 @@
         <v-flex xs8 class="user-defined-actions__wrapper">
             <h1>Blok instrukcji do wykonania</h1>
             <h3>Początek</h3>
-            <draggable v-model="userDefinedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions-contaner">
-                <action-tile v-for="(element, index) in userDefinedActions" 
+            <draggable v-model="userSelectedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions-contaner">
+                <action-tile v-for="(element, index) in userSelectedActions" 
                     :key="index" 
                     :droneAction="element"
                     :index="index"
-                    :arrayContaining="userDefinedActions">
+                    :arrayContaining="userSelectedActions">
                 </action-tile>
             </draggable>
             <h3>Koniec</h3>
@@ -63,7 +63,7 @@ export default class Home extends Vue {
         new DroneAction('Do przodu', ActionType.Forward),
         new DroneAction('Do tyłu', ActionType.Back)
     ];
-    userDefinedActions: DroneAction[] = [];
+    userSelectedActions: DroneAction[] = [];
 
     customClone(originalAction: DroneAction): DroneAction {
         return new DroneAction(originalAction.actionLabel, originalAction.actionType, originalAction.speed, originalAction.duration);
@@ -71,7 +71,7 @@ export default class Home extends Vue {
 
     async submitForm() {
         try {
-            let response = await this.$store.dispatch('sendActionsToAPI', this.userDefinedActions) as AxiosResponse;
+            let response = await this.$store.dispatch('sendActionsToAPI', this.userSelectedActions) as AxiosResponse;
 
             if(response.status == 200) {
                 console.log('everything fine');
