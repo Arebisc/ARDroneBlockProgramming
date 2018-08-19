@@ -12,7 +12,7 @@ declare module 'ar-drone' {
         public _pcmd: any;
         public _repeaters: any;
         public _afterOffset: any;
-        public _disableEmergency: any;
+        public _disableEmergency: boolean;
         public _lastState: any;
         public _lastBattery: any;
         public _lastAltitude: any;
@@ -69,6 +69,10 @@ declare module 'ar-drone' {
 
         up(speed: any): any;
 
+        on(eventName: string, callback: Function);
+
+        once(eventName: string, callback: Function);
+
     }
 
     export class PngStream {
@@ -122,7 +126,7 @@ declare module 'ar-drone' {
 
     export function createPngStream(options: any): any;
 
-    export function createUdpControl(options: any): any;
+    export function createUdpControl(options: any): UdpControl;
 
     export function createUdpNavdataStream(options: any): any;
 
