@@ -1,5 +1,4 @@
 import * as request from 'request';
-import { readFile, readFileSync, fstat } from 'fs';
 
 export class ComputerVision {
     private _key: string = "";
