@@ -80,6 +80,7 @@ declare module 'ar-drone' {
 
         resume(): void;
 
+        once(data: string, callback: Function): any;
     }
 
     export class UdpControl {
