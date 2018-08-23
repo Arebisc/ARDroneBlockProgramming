@@ -216,3 +216,47 @@ export class DroneOperator {
             }, timeInMiliseconds);
         });
     }
+
+    private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            //todo
+        });
+    }
+
+    private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            //todo
+        });
+    }
+
+    public async containsTag(tag: string): Promise<boolean> {
+        let photoReceived = await this.takePhoto();
+        let tagsReceived = await this._computerVision.getImageTags(photoReceived, 0.0);
+
+        console.log(tagsReceived);
+        if(tagsReceived.includes(tag)){
+            return true;
+        }   
+        
+        return false;
+    }
+
+    private async takePhoto() :Promise<any> {
+        return new Promise<arDrone.Client>((resolve, reject) => {
+            this._pngStream.once('data', function (data) {
+                resolve(data);
+            });
+        });
+    }
+
+    private initNavdata() {
+        setInterval(() => {
+            this._client.once('navdata', console.log);    
+        }, 2000);
+        
+        // setInterval(console.log(this._client), 2000);
+    }
+}
+
+
+const droneOperator = new DroneOperator();
