@@ -1,28 +1,31 @@
 import { DroneAction } from './classes/droneAction';
 import * as arDrone from 'ar-drone';
 import { ActionType } from './Types/ActionType';
+import { ComputerVision } from './computerVision';
 
 
 export class DroneOperator {
     private _client: arDrone.Client;
+    private _pngStream: arDrone.PngStream;
+    private _computerVision: ComputerVision;
 
     public constructor(droneIp: string = "192.168.1.1") {
         this._client = arDrone.createClient({
-            ip: droneIp
+            ip: droneIp,
         });
-        console.log(this._client);
+
+        this._pngStream = this._client.getPngStream();
+
+        this._computerVision = new ComputerVision("url here", "key here");
+
     }
 
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
         console.log('runActions');
-        this.reset();
         await this.takeOff();
         await this.stop();
 
         return new Promise<boolean>(async (resolve, reject) => {
-            
-            console.log('after takeoff');
-
             console.log('droneActions: ' + droneActions.length);
 
             for (let i: number = 0; i < droneActions.length; i++ ) {
@@ -32,18 +35,9 @@ export class DroneOperator {
             console.log('outside foreach');
 
             await this.land();
-            await this.stop();
 
-            this.reset();
             resolve(true);
         });
-    }
-
-    private reset(): void {
-        console.log('reset');
-        // this._client._udpNavdatasStream.destroy();
-        // this._client._udpControl.close();
-        this._client.disableEmergency();
     }
 
     private async runAction(action: DroneAction) {
@@ -199,11 +193,8 @@ export class DroneOperator {
             console.log('takeoff');
             this._client.takeoff(() => {
                 console.log('aftertk');
-                setTimeout(() => {
-                    console.log('inside timeout');
-                    resolve(this._client);
-                }, delay);
             });
+            setTimeout(resolve(this._client), delay);
         });
     }
 
@@ -225,4 +216,3 @@ export class DroneOperator {
             }, timeInMiliseconds);
         });
     }
-}
