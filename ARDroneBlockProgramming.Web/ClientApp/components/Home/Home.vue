@@ -61,7 +61,9 @@ export default class Home extends Vue {
         new DroneAction('W lewo', ActionType.Left),
         new DroneAction('W prawo', ActionType.Right),
         new DroneAction('Do przodu', ActionType.Forward),
-        new DroneAction('Do tyłu', ActionType.Back)
+        new DroneAction('Do tyłu', ActionType.Back),
+        new DroneAction('Obracaj w prawo póki nie napotkasz: ', ActionType.TurnRightTillRecognize),
+        new DroneAction('Obracaj w lewo póki nie napotkasz: ', ActionType.TurnLeftTillRecognize)
     ];
     userSelectedActions: DroneAction[] = [];
 
