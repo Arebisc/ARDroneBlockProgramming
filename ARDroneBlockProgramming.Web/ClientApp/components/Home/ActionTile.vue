@@ -22,6 +22,13 @@
                     required
                     class="params-input"
                 ></v-text-field>
+                <v-text-field
+                    v-model="droneAction.tag"
+                    label="Szukany element"
+                    required
+                    class="params-input"
+                    v-if="tagInputConditionalRendering">
+                </v-text-field>
             </v-flex>
             <v-flex xs1>
                 <v-icon @click="handleRemove">remove_circle</v-icon>
@@ -34,6 +41,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { DroneAction } from '../../classes/DroneAction';
+import { ActionType } from '../../types/ActionType';
 
 
 @Component
@@ -41,9 +49,21 @@ export default class Home extends Vue {
     @Prop(DroneAction) droneAction!: DroneAction;
     @Prop(Number) index!: number;
     @Prop(Array) arrayContaining!: Array<DroneAction>;
+    @Prop(String) tag!: string;
 
     handleRemove() :void {
         this.arrayContaining.splice(this.index, 1);
+    }
+
+    get tagInputConditionalRendering(): boolean {
+        if(this.droneAction.actionType == ActionType.TurnRightTillRecognize) {
+            return true;
+        }
+        else if(this.droneAction.actionType == ActionType.TurnLeftTillRecognize) {
+            return true;
+        }
+
+        return false;
     }
 }
 </script>
