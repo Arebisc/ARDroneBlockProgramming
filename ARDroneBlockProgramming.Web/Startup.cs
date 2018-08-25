@@ -45,6 +45,11 @@ namespace ARDroneBlockProgramming.Web
 
             app.UseStaticFiles();
 
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<DroneHub>("/droneHub");
+            });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -54,11 +59,6 @@ namespace ARDroneBlockProgramming.Web
                 routes.MapSpaFallbackRoute(
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
-            });
-
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<DroneHub>("/droneHub");
             });
         }
     }

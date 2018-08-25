@@ -14,8 +14,8 @@
             <h1>Blok instrukcji do wykonania</h1>
             <h3>Początek</h3>
             <draggable v-model="userSelectedActions" :options="{ group: 'drone-actions-group' }" class="user-defined-actions-contaner">
-                <action-tile v-for="(element, index) in userSelectedActions" 
-                    :key="index" 
+                <action-tile v-for="(element, index) in userSelectedActions"
+                    :key="index"
                     :droneAction="element"
                     :index="index"
                     :arrayContaining="userSelectedActions">
@@ -23,7 +23,7 @@
             </draggable>
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
-            <v-btn type="button" @click="submitForm" color="info">Wykonaj akcje</v-btn>
+            <v-btn type="button" @click="sendActions" color="info">Wykonaj akcje</v-btn>
         </v-flex>
     </v-layout>
 </template>
@@ -36,6 +36,7 @@ import { DroneAction } from '../../classes/DroneAction';
 import ActionTileComponent from './ActionTile.vue';
 import { ActionType } from './../../types/ActionType';
 import { AxiosResponse } from 'axios';
+import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 
 
 @Component({
@@ -45,12 +46,11 @@ import { AxiosResponse } from 'axios';
     }
 })
 export default class Home extends Vue {
-
     actionsContainerOptions = {
         group: {
             name: 'drone-actions-group',
             pull: 'clone',
-            put: false 
+            put: false
         },
         sort: false
     };
@@ -67,8 +67,32 @@ export default class Home extends Vue {
     ];
     userSelectedActions: DroneAction[] = [];
 
+    signalRConnection!: HubConnection;
+
+
+    async created() {
+        await this.initializeSignalRConnection();
+    }
+
+    async initializeSignalRConnection() {
+        this.signalRConnection = new HubConnectionBuilder()
+            .withUrl('/droneHub')
+            .build();
+
+        await this.signalRConnection.start();
+    }
+
     customClone(originalAction: DroneAction): DroneAction {
         return new DroneAction(originalAction.actionLabel, originalAction.actionType, originalAction.speed, originalAction.duration);
+    }
+
+    async sendActions() {
+        try {
+            this.signalRConnection.invoke("SendActionsToDrone", this.userSelectedActions);
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 
     async submitForm() {

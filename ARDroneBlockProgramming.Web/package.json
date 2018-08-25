@@ -62,7 +62,9 @@
     "test:debug": "node node_modules/karma/bin/karma start --no-single-run --debug --browsers PhantomJS"
   },
   "dependencies": {
+    "@aspnet/signalr": "^1.0.3",
     "axios": "^0.18.0",
+    "tslib": "^1.9.3",
     "vuedraggable": "^2.16.0",
     "vuetify": "^1.1.1"
   }

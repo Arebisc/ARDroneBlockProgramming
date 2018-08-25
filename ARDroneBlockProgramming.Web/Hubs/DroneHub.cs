@@ -9,7 +9,7 @@ namespace ARDroneBlockProgramming.Web.Hubs
 {
     public class DroneHub : Hub
     {
-        public async Task SendActionsToPerform(DroneActionViewModel[] actionsToPerform)
+        public async Task SendActionsToDrone(DroneActionViewModel[] actionsToPerform)
         {
             await Clients.All.SendAsync("PerformActions", actionsToPerform);
         }
