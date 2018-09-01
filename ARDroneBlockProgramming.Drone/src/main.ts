@@ -1,18 +1,13 @@
-﻿import { HttpService } from './httpService';
+﻿import { SignalRService } from './signalRService';
 
 export class Main {
-    private readonly httpService: HttpService;
+    private readonly signalRService: SignalRService;
 
     public constructor() {
-        this.httpService = new HttpService();
-    }
-
-    public Start(): void {
         console.log('Application starting');
-
-        this.httpService.startListening();
+        this.signalRService = new SignalRService();
+        console.log('Application started');
     }
 }
 
 const main = new Main();
-main.Start();
