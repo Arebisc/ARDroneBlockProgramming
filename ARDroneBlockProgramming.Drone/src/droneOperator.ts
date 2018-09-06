@@ -229,14 +229,17 @@ export class DroneOperator {
         });
     }
 
-    public async containsTag(tag: string): Promise<boolean> {
+    private async anyTagRecognized(tags: string[]): Promise<boolean> {
         let photoReceived = await this.takePhoto();
         let tagsReceived = await this._computerVision.getImageTags(photoReceived, 0.0);
 
         console.log(tagsReceived);
-        if(tagsReceived.includes(tag)){
-            return true;
-        }   
+        for(let i = 0; i < tags.length; i++) {
+            if(tagsReceived.includes(tags[i])){
+                console.log('Recognized: ', tags[i]);
+                return true;
+            }    
+        }
         
         return false;
     }
