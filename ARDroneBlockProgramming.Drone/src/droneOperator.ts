@@ -2,6 +2,7 @@ import { DroneAction } from './classes/droneAction';
 import * as arDrone from 'ar-drone';
 import { ActionType } from './Types/ActionType';
 import { ComputerVision } from './computerVision';
+import { DroneNavData } from './interfaces/droneOperator';
 
 
 export class DroneOperator {
