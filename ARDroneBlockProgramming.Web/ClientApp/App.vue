@@ -3,7 +3,9 @@
     <v-navigation-drawer
       fixed
       app
+      clipped
       v-model="navigationDrawer"
+      class="navigation-drower"
     >
       <v-list dense>
         <v-list-tile @click="$router.push({ name: 'home' })" class="no-underscore">
@@ -16,9 +18,8 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar color="indigo" dark fixed app>
-      <v-toolbar-side-icon @click.stop="navigationDrawer = !navigationDrawer"></v-toolbar-side-icon>
-      <v-toolbar-title>ARDrone blokowe programowanie</v-toolbar-title>
+    <v-toolbar color="indigo" fixed app clipped-left light>
+      <v-toolbar-title class="main-title">ARDrone blokowe programowanie</v-toolbar-title>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
@@ -48,5 +49,12 @@ export default class App extends Vue {
 </script>
 
 <style scoped>
+.main-title {
+  color: #ffffff;
+}
 
+.navigation-drower {
+  box-shadow: 10px 0 5px -2px #888;
+  -webkit-box-shadow: 10px 0 5px -2px #888;
+}
 </style>
