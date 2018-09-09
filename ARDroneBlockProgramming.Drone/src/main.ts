@@ -8,6 +8,13 @@ export class Main {
         this.signalRService = new SignalRService();
         console.log('Application started');
     }
-}
 
-const main = new Main();
+    public async initServices() {
+        await this.signalRService.initSignalR();
+        await this.signalRService.initDroneTagsRecognizingInterval();
+    }
+}
+(async () => {
+    const main = new Main();
+    await main.initServices();
+})();

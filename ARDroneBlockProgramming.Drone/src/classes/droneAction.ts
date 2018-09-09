@@ -1,6 +1,5 @@
 import { ActionType } from '../Types/ActionType';
 
-
 export class DroneAction {
     public actionLabel: string;
     public actionType: ActionType;

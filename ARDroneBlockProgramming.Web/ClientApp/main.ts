@@ -11,7 +11,6 @@ Vue.config.devtools = true;
 
 Vue.use(Vuetify);
 
-
 new Vue({
     el: '#app',
     store: Store,

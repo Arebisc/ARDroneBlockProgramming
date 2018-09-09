@@ -35,13 +35,12 @@ export class DroneOperator {
 
         return new Promise<boolean>(async (resolve, reject) => {
             console.log('droneActions: ' + droneActions.length);
-
+            
             for (let i: number = 0; i < droneActions.length; i++ ) {
                 await this.runAction(droneActions[i]);
                 await this.stop();
             }
-            console.log('outside foreach');
-
+            console.log('outside actions foreach');
             await this.land();
 
             resolve(true);

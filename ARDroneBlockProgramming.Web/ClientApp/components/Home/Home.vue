@@ -25,6 +25,19 @@
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
             <v-btn type="button" @click="sendActions" color="info">Wykonaj akcje</v-btn>
         </v-flex>
+        <v-snackbar
+            v-model="snackbar"
+            bottom
+        >
+            {{ snackbarText }}
+            <v-btn
+            color="pink"
+            flat
+            @click="snackbar = false; snackbarText=''"
+            >
+            Close
+            </v-btn>
+      </v-snackbar>
     </v-layout>
 </template>
 
@@ -55,6 +68,9 @@ export default class Home extends Vue {
         sort: false
     };
 
+    snackbar = false;
+    snackbarText = "";
+
     droneActions: DroneAction[] = [
         new DroneAction('Do góry', ActionType.Up),
         new DroneAction('W dół', ActionType.Down),
@@ -78,6 +94,15 @@ export default class Home extends Vue {
         this.signalRConnection = new HubConnectionBuilder()
             .withUrl('/droneHub')
             .build();
+
+        this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
+            this.snackbarText = "Dron zakończył wykonywanie poleceń";
+            this.snackbar = true;
+        });
+
+        this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
+            console.log(tags);
+        });
 
         await this.signalRConnection.start();
     }
