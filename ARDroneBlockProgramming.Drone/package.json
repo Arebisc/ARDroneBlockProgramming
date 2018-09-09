@@ -8,14 +8,11 @@
     "name": "Michał Sibera"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.5.8",
     "@types/node": "^6.0.87",
     "@types/request": "^2.47.1"
   },
   "dependencies": {
     "@aspnet/signalr": "^1.0.3",
-    "@elastic.io/amqp-rpc": "^2.0.3",
-    "amqplib": "^0.5.2",
     "ar-drone": "^0.3.3",
     "nodemon": "^1.18.3",
     "request": "^2.88.0",
