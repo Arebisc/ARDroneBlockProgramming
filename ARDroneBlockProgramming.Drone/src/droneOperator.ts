@@ -15,11 +15,18 @@ export class DroneOperator {
         });
 
         this._pngStream = this._client.getPngStream();
-
         this._computerVision = new ComputerVision("url here", "key here");
-
     }
 
+    public getNavdata():Promise<any> {
+        return new Promise((resolve, reject) => {
+            this._client.once('navdata', console.log);
+            this._client.once('navdata', (data) => {
+                resolve(data);
+            });
+        });
+    }
+    
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
         console.log('runActions');
         await this.takeOff();
@@ -92,6 +99,16 @@ export class DroneOperator {
             case ActionType.TurnRight:
                 await this.turnRight(action);
                 console.log('awaited turnRight');
+            break;
+
+            case ActionType.TurnLeftTillRecognize:
+                await this.turningLeftTillRecognizedObject(action);
+                console.log('awaited turnLeftTillRecognize');
+            break;
+
+            case ActionType.TurnRightTillRecognize:
+                await this.turningRightTillRecognizedObject(action);
+                console.log('awaited turnLeftTillRecognize');
             break;
         }
 
@@ -218,48 +235,61 @@ export class DroneOperator {
     }
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>((resolve, reject) => {
-            //todo
+        return new Promise<arDrone.Client>(async (resolve, reject) => {
+            let tagsInDroneRange = await this.getTagsInDroneRange();
+            let anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange);
+
+            while(!anyTagRecognized) {
+                await this.turnLeft(droneAction);
+
+                tagsInDroneRange = await this.getTagsInDroneRange();
+                anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange)
+            }
+
+            resolve(this._client);
         });
     }
 
     private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>((resolve, reject) => {
-            //todo
+        return new Promise<arDrone.Client>(async (resolve, reject) => {
+            let tagsInDroneRange = await this.getTagsInDroneRange();
+            let anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange);
+
+            while(!anyTagRecognized) {
+                await this.turnRight(droneAction);
+
+                tagsInDroneRange = await this.getTagsInDroneRange();
+                anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange)
+            }
+
+            resolve(this._client);
         });
     }
 
-    private async anyTagRecognized(tags: string[]): Promise<boolean> {
+    public async getTagsInDroneRange() {
         let photoReceived = await this.takePhoto();
         let tagsReceived = await this._computerVision.getImageTags(photoReceived, 0.0);
 
+        return tagsReceived;
+    }
+
+    private anyTagRecognized(tagsToRecognize: string[], tagsReceived: string[]): boolean {
         console.log(tagsReceived);
-        for(let i = 0; i < tags.length; i++) {
-            if(tagsReceived.includes(tags[i])){
-                console.log('Recognized: ', tags[i]);
+        for(let i = 0; i < tagsToRecognize.length; i++) {
+            if(tagsReceived.includes(tagsToRecognize[i])){
+                console.log('Recognized: ', tagsToRecognize[i]);
                 return true;
-            }    
+            }
         }
         
         return false;
     }
 
-    private async takePhoto() :Promise<any> {
-        return new Promise<arDrone.Client>((resolve, reject) => {
+    public async takePhoto() :Promise<object> {
+        return new Promise<object>((resolve, reject) => {
             this._pngStream.once('data', function (data) {
                 resolve(data);
             });
         });
     }
-
-    private initNavdata() {
-        setInterval(() => {
-            this._client.once('navdata', console.log);    
-        }, 2000);
-        
-        // setInterval(console.log(this._client), 2000);
-    }
 }
-
-
-const droneOperator = new DroneOperator();
