@@ -238,14 +238,14 @@ export class DroneOperator {
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
             let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange);
+            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
             while(!anyTagRecognized) {
                 await this.turnLeft(droneAction);
                 await this.wait(1000);
 
                 tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange)
+                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
             }
 
             resolve(this._client);
@@ -255,13 +255,13 @@ export class DroneOperator {
     private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
             let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange);
+            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
             while(!anyTagRecognized) {
                 await this.turnRight(droneAction);
 
                 tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange)
+                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
             }
 
             resolve(this._client);
@@ -275,13 +275,11 @@ export class DroneOperator {
         return tagsReceived;
     }
 
-    private anyTagRecognized(tagsToRecognize: string[], tagsReceived: string[]): boolean {
+    private tagRecognized(tagToRecognize: string, tagsReceived: string[]): boolean {
         console.log(tagsReceived);
-        for(let i = 0; i < tagsToRecognize.length; i++) {
-            if(tagsReceived.includes(tagsToRecognize[i])){
-                console.log('Recognized: ', tagsToRecognize[i]);
-                return true;
-            }
+        if(tagsReceived.includes(tagToRecognize)){
+            console.log('Recognized: ', tagToRecognize);
+            return true;
         }
         
         return false;
