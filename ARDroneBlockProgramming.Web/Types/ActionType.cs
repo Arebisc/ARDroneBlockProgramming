@@ -14,6 +14,8 @@ namespace ARDroneBlockProgramming.Web.Types
         Forward = 4,
         Back = 5,
         TurnRight = 6,
-        TurnLeft = 7
+        TurnLeft = 7,
+        TurnRightTillRecognize = 8,
+        TurnLeftTillRecognize = 9
     }
 }

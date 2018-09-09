@@ -12,5 +12,6 @@ namespace ARDroneBlockProgramming.Web.ViewModels
         public ActionType ActionType { get; set; }
         public double Speed { get; set; }
         public int Duration { get; set; }
+        public string[] Tags { get; set; }
     }
 }
