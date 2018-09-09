@@ -18,7 +18,7 @@ export class DroneOperator {
         this._computerVision = new ComputerVision("url here", "key here");
     }
 
-    public getNavdata():Promise<any> {
+    public getNavdata():Promise<DroneNavData> {
         return new Promise((resolve, reject) => {
             this._client.once('navdata', console.log);
             this._client.once('navdata', (data) => {
@@ -241,6 +241,7 @@ export class DroneOperator {
 
             while(!anyTagRecognized) {
                 await this.turnLeft(droneAction);
+                await this.wait(1000);
 
                 tagsInDroneRange = await this.getTagsInDroneRange();
                 anyTagRecognized = this.anyTagRecognized(droneAction.tags, tagsInDroneRange)
