@@ -1,4 +1,5 @@
 import * as request from 'request';
+import { IApiJsonResponse, IApiMetadata, ITag } from './interfaces/computerVision';
 
 export class ComputerVision {
     private _key: string = "";
@@ -9,7 +10,7 @@ export class ComputerVision {
         this._key = key;
     }
 
-    public async getImageTags(image: any, predictionThreshold: number = 0.75): Promise<Array<string>> {
+    public async getImageTags(image: object, predictionThreshold: number = 0.75): Promise<Array<string>> {
         let tags = new Array<string>();
 
         try {
@@ -29,7 +30,7 @@ export class ComputerVision {
         }
     } 
 
-    private async postImage(image: any) {
+    private async postImage(image: object) {
         const options = this.getUrlOptions(image);
 
         return new Promise((resolve, reject) => {
@@ -40,7 +41,7 @@ export class ComputerVision {
         });
     }
 
-    private getUrlOptions(image: any) {
+    private getUrlOptions(image: object) {
         const params = {
             'visualFeatures': 'Tags',
             'details': '',
@@ -58,21 +59,3 @@ export class ComputerVision {
         };
     }
 }
-
-interface IApiJsonResponse {
-    tags: Array<ITag>;
-    requestId: string;
-    metadata: IApiMetadata;
-}
-
-interface IApiMetadata {
-    height: string,
-    width: string,
-    format: string
-}
-
-interface ITag {
-    name: string;
-    confidence: number
-}
-
