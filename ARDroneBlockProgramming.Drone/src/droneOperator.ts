@@ -241,6 +241,7 @@ export class DroneOperator {
 
             while(!anyTagRecognized) {
                 await this.turnLeft(droneAction);
+                await this.stop();
                 await this.wait(1000);
 
                 tagsInDroneRange = await this.getTagsInDroneRange();
@@ -258,6 +259,8 @@ export class DroneOperator {
 
             while(!anyTagRecognized) {
                 await this.turnRight(droneAction);
+                await this.stop();
+                await this.wait(1000);
 
                 tagsInDroneRange = await this.getTagsInDroneRange();
                 anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
