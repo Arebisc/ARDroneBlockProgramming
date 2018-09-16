@@ -12,13 +12,13 @@
             <v-flex xs8>
                 <v-text-field
                     v-model="droneAction.speed"
-                    label="Prędkość"
+                    label="Prędkość (od 0 do 1)"
                     required
                     class="params-input"
                 ></v-text-field>
                 <v-text-field
                     v-model="droneAction.duration"
-                    label="Czas trwania"
+                    label="Czas trwania (w ms)"
                     required
                     class="params-input"
                 ></v-text-field>
@@ -26,7 +26,7 @@
                     v-model="droneAction.tag"
                     label="Szukany element"
                     required
-                    class="params-input"
+                    class="params-input searching-element-input"
                     v-if="tagInputConditionalRendering">
                 </v-text-field>
             </v-flex>
@@ -91,5 +91,9 @@ export default class Home extends Vue {
 
 .action-tile .single-action-name {
     margin: 10px 0 10px 0;
+}
+
+.searching-element-input {
+    width: 100%;
 }
 </style>
