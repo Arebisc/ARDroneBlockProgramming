@@ -16,7 +16,21 @@
             <v-list-tile-title>Strona główna</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>local_see</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            Dron widzi:
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile v-for="(tag, index) in tagsInDroneRange" :key="index">
+          <v-list-tile-content>
+            {{ tag }}
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
+
     </v-navigation-drawer>
     <v-toolbar color="indigo" fixed app clipped-left light>
       <v-toolbar-title class="main-title">ARDrone blokowe programowanie</v-toolbar-title>
@@ -39,11 +53,18 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
+import { EventBus } from './eventBus';
 
 @Component
 export default class App extends Vue {
   navigationDrawer: boolean = true;
+  tagsInDroneRange: string[] = new Array();
 
+  created() {
+    EventBus.$on('received-tags-from-drone', (tags: string[]) => {
+      this.tagsInDroneRange = tags;
+    });
+  }
 }
 
 </script>
@@ -56,5 +77,10 @@ export default class App extends Vue {
 .navigation-drower {
   box-shadow: 10px 0 5px -2px #888;
   -webkit-box-shadow: 10px 0 5px -2px #888;
+}
+
+.no-underscore {
+  text-decoration: none;
+  margin-bottom: 20px;
 }
 </style>

@@ -46,6 +46,6 @@ export class SignalRService {
         setInterval(async () => {
             let tags = await this._droneOperator.getTagsInDroneRange();
             this._connection.invoke('TagsRecognizedByDrone', tags);
-        }, 10000);
+        }, 2000);
     }
 }

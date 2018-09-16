@@ -50,6 +50,7 @@ import ActionTileComponent from './ActionTile.vue';
 import { ActionType } from './../../types/ActionType';
 import { AxiosResponse } from 'axios';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+import { EventBus } from './../../eventBus';
 
 
 @Component({
@@ -102,7 +103,7 @@ export default class Home extends Vue {
 
         this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
             console.log(tags);
-            
+            EventBus.$emit('received-tags-from-drone', tags);
         });
 
         await this.signalRConnection.start();
