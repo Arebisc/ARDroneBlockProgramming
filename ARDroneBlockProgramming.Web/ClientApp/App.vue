@@ -24,7 +24,7 @@
             Dron widzi:
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile v-for="(tag, index) in tagsInDroneRange" :key="index">
+        <v-list-tile v-for="(tag, index) in droneSees" :key="index">
           <v-list-tile-content>
             {{ tag }}
           </v-list-tile-content>
@@ -53,18 +53,18 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { EventBus } from './eventBus';
+import { mapGetters } from 'vuex';
 
-@Component
+@Component({
+  computed: {
+    ...mapGetters({
+      droneSees: 'droneSees'
+    })
+  }
+})
 export default class App extends Vue {
   navigationDrawer: boolean = true;
   tagsInDroneRange: string[] = new Array();
-
-  created() {
-    EventBus.$on('received-tags-from-drone', (tags: string[]) => {
-      this.tagsInDroneRange = tags;
-    });
-  }
 }
 
 </script>

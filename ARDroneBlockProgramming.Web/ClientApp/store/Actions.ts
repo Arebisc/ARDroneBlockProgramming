@@ -17,6 +17,10 @@ const actions: ActionTree<ManagerState, ManagerState> = {
                 reject(error);
             })
         });
+    },
+
+    setTagsWhichDroneSees({commit, state}, tags: string[]) {
+        commit('SET_DRONE_SEES', tags);
     }
 }
 
