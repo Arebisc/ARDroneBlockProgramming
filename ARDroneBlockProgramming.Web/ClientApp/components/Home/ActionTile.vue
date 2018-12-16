@@ -18,7 +18,7 @@
                 ></v-text-field>
                 <v-text-field
                     v-model="droneAction.duration"
-                    label="Czas trwania (w ms)"
+                    :label="renderTimeInformation()"
                     required
                     class="params-input"
                 ></v-text-field>
@@ -64,6 +64,18 @@ export default class Home extends Vue {
         }
 
         return false;
+    }
+
+    renderTimeInformation(): string {
+        var intervalTime = "Interwał czasowy (w ms)";
+        var durationTime = "Czas trwania (w ms)"
+
+        if(this.droneAction.actionType === ActionType.TurnRightTillRecognize ||
+            this.droneAction.actionType === ActionType.TurnLeftTillRecognize) {
+            return intervalTime;
+        }   
+        
+        return durationTime;
     }
 }
 </script>
