@@ -16,12 +16,15 @@ export class DroneOperator {
         });
 
         this._pngStream = this._client.getPngStream();
+        this._client.config('general:navdata_demo', 'FALSE', (data) => {
+            console.log('callback');
+        });
         this._computerVision = new ComputerVision("url here", "key here");
     }
 
     public getNavdata():Promise<DroneNavData> {
         return new Promise((resolve, reject) => {
-            this._client.once('navdata', console.log);
+            // this._client.once('navdata', console.log);
             this._client.once('navdata', (data) => {
                 resolve(data);
             });
