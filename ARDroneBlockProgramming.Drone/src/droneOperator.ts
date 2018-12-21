@@ -21,7 +21,7 @@ export class DroneOperator {
         });
 
         this._pngStream = this._client.getPngStream();
-        this._udpControl = this._client.createUdpControl();
+        this._udpControl = arDrone.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
     }
 
