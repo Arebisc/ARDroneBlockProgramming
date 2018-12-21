@@ -73,6 +73,8 @@ declare module 'ar-drone' {
 
         once(eventName: string, callback: Function);
 
+        createUdpControl(options?: any): UdpControl;
+
     }
 
     export class PngStream {

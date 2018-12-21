@@ -9,6 +9,11 @@ export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
+    private _udpControl: arDrone.UdpControl;
+
+    private EMERGENCY_BIT_POSITION: number = 8;
+    
+    public emergencyStopFlag: boolean = false;
 
     public constructor(droneIp: string = "192.168.1.1") {
         this._client = arDrone.createClient({
@@ -16,6 +21,7 @@ export class DroneOperator {
         });
 
         this._pngStream = this._client.getPngStream();
+        this._udpControl = this._client.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
     }
 
@@ -211,7 +217,7 @@ export class DroneOperator {
             this._client.takeoff(() => {
                 console.log('aftertk');
             });
-            setTimeout(resolve(this._client), delay);
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
@@ -285,6 +291,16 @@ export class DroneOperator {
         }
         
         return false;
+    }
+
+    public emergencyStop() {
+        this._udpControl.raw("REF", (1 << this.EMERGENCY_BIT_POSITION));
+        this._udpControl.flush();
+    }
+
+    public emergencyStopReset() {
+        this._udpControl.raw("REF", (0 << this.EMERGENCY_BIT_POSITION));
+        this._udpControl.flush();
     }
 
     public async takePhoto() :Promise<object> {
