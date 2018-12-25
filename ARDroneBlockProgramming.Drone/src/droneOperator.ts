@@ -9,6 +9,7 @@ export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
+    private _videoStream: arDrone.TcpVideoStream;
 
     public constructor(droneIp: string = "192.168.1.1") {
         this._client = arDrone.createClient({
@@ -17,9 +18,10 @@ export class DroneOperator {
 
         this._pngStream = this._client.getPngStream();
         this._computerVision = new ComputerVision("url here", "key here");
+        this._videoStream = this._client.getVideoStream();
     }
 
-    public getNavdata():Promise<DroneNavData> {
+    public getNavdata(): Promise<DroneNavData> {
         return new Promise((resolve, reject) => {
             this._client.once('navdata', console.log);
             this._client.once('navdata', (data) => {
@@ -293,5 +295,9 @@ export class DroneOperator {
                 resolve(data);
             });
         });
+    }
+
+    public configureVideoStreaming(callback: Function) {
+        this._videoStream.on('data', callback);
     }
 }
