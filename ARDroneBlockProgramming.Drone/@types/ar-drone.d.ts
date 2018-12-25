@@ -131,6 +131,10 @@ declare module 'ar-drone' {
 
     export function createUdpNavdataStream(options: any): any;
 
+    export class TcpVideoStream {
+        on(eventName: string, callback: Function);
+    }
+
     export namespace Client {
         class PngEncoder {
             constructor(options: any);
