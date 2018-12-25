@@ -1,4 +1,5 @@
 import { HubConnectionBuilder, HubConnection } from '@aspnet/signalr';
+import { MessagePackHubProtocol } from '@aspnet/signalr-protocol-msgpack';
 import { DroneOperator } from './droneOperator';
 import { DroneAction } from './classes/droneAction';
 
@@ -17,12 +18,14 @@ export class SignalRService {
     public async initSignalR() {
         this._connection = new HubConnectionBuilder()
             .withUrl("http://localhost:5026/droneHub")
+            .withHubProtocol(new MessagePackHubProtocol())
             .build();
 
         try {
             await this._connection.start()
 
             this.initConnections();
+            this.initVideoStream();
 
             console.log('Connection started');
         }
@@ -47,5 +50,11 @@ export class SignalRService {
             let tags = await this._droneOperator.getTagsInDroneRange();
             this._connection.invoke('TagsRecognizedByDrone', tags);
         }, 2000);
+    }
+
+    private initVideoStream() {
+        this._droneOperator.configureVideoStreaming(async (data) => {
+            await this._connection.invoke('VideoStreamFromDrone', data);
+        });
     }
 }
