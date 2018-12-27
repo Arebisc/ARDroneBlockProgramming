@@ -24,7 +24,9 @@ namespace ARDroneBlockProgramming.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSignalR().AddMessagePackProtocol();
+            services.AddSignalR()
+                .AddMessagePackProtocol();
+                
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,7 +49,11 @@ namespace ARDroneBlockProgramming.Web
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<DroneHub>("/droneHub");
+                routes.MapHub<DroneHub>("/droneHub", options =>
+                {
+                    options.ApplicationMaxBufferSize = int.MaxValue;
+                    options.TransportMaxBufferSize = int.MaxValue;
+                });
             });
 
             app.UseMvc(routes =>

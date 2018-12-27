@@ -49,7 +49,8 @@ import { DroneAction } from '../../classes/DroneAction';
 import ActionTileComponent from './ActionTile.vue';
 import { ActionType } from './../../types/ActionType';
 import { AxiosResponse } from 'axios';
-import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+// import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+// import { MessagePackHubProtocol } from '@aspnet/signalr-protocol-msgpack';
 
 
 @Component({
@@ -83,16 +84,18 @@ export default class Home extends Vue {
     ];
     userSelectedActions: DroneAction[] = [];
 
-    signalRConnection!: HubConnection;
-
+    signalRConnection!: signalR.HubConnection;
+    videoBuffer!: Uint8Array;
 
     async created() {
         await this.initializeSignalRConnection();
     }
 
     async initializeSignalRConnection() {
-        this.signalRConnection = new HubConnectionBuilder()
+        this.signalRConnection = new signalR.HubConnectionBuilder()
             .withUrl('/droneHub')
+            // .withHubProtocol(new MessagePackHubProtocol())
+            .withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol())
             .build();
 
         this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
@@ -100,9 +103,13 @@ export default class Home extends Vue {
             this.snackbar = true;
         });
 
-        this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
+        this.signalRConnection.on('DroneRecognizedTagsToClient', (tags: string[]) => {
             console.log(tags);
             this.$store.dispatch('setTagsWhichDroneSees', tags);
+        });
+
+        this.signalRConnection.on('PngBuffer', async (buffer: Uint8Array) => {
+            this.$store.dispatch('savePngBuffer', buffer);
         });
 
         await this.signalRConnection.start();

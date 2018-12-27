@@ -2,6 +2,7 @@ import { DroneAction } from './../classes/DroneAction';
 import { ActionTree } from 'vuex';
 import { ManagerState } from './ManagerState';
 import axios, { AxiosResponse } from 'axios';
+import { toBase64 } from '../helpers/Base64Helper';
 
 
 const actions: ActionTree<ManagerState, ManagerState> = {
@@ -21,6 +22,10 @@ const actions: ActionTree<ManagerState, ManagerState> = {
 
     setTagsWhichDroneSees({commit, state}, tags: string[]) {
         commit('SET_DRONE_SEES', tags);
+    },
+
+    savePngBuffer({commit, state}, buffer: Uint8Array) {
+        commit('SET_PNG_BUFFER', toBase64(buffer));
     }
 }
 

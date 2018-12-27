@@ -24,9 +24,9 @@ namespace ARDroneBlockProgramming.Web.Hubs
             await Clients.All.SendAsync("DroneRecognizedTagsToClient", tags);
         }
 
-        public async Task VideoStreamFromDrone(byte[] buffer)
+        public async Task PngBufferFromDrone(byte[] buffer)
         {
-            //await Clients.All.SendAsync("DroneSendsVideoBuffer", buffer);
+            await Clients.All.SendAsync("PngBuffer", buffer);
         }
     }
 }
