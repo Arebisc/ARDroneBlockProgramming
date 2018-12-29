@@ -12,7 +12,7 @@ export class SignalRService {
     private _droneOperator: DroneOperator;
 
     public constructor() {
-        this._droneOperator = new DroneOperator(this.recognizedObjectAlert);
+        this._droneOperator = new DroneOperator(this.recognizedObjectAlert, this.actionCompleted);
     }
 
     public async initSignalR() {
@@ -52,5 +52,9 @@ export class SignalRService {
 
     private async recognizedObjectAlert(objectName: string) {
         this._connection.invoke('DroneRecognizedObjectFromAction', objectName);
+    }
+
+    private actionCompleted() {
+        this._connection.invoke('DroneFinishedOneAction');
     }
 }

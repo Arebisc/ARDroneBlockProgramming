@@ -9,9 +9,14 @@ export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
-    private _recognizedObjectCallbackAlert: Function;
 
-    public constructor(recognizedObjectCallback: Function, droneIp: string = "192.168.1.1") {
+    private _recognizedObjectCallbackAlert: Function;
+    private _droneFinishedActionCallback: Function;
+
+    public constructor(recognizedObjectCallback: Function,
+        droneFinishedActionCallback: Function,
+        droneIp: string = "192.168.1.1") 
+        {
         this._client = arDrone.createClient({
             ip: droneIp,
         });
@@ -19,6 +24,7 @@ export class DroneOperator {
         this._pngStream = this._client.getPngStream();
         this._computerVision = new ComputerVision("url here", "key here");
         this._recognizedObjectCallbackAlert = recognizedObjectCallback;
+        this._droneFinishedActionCallback = droneFinishedActionCallback;
     }
 
     public getNavdata():Promise<DroneNavData> {
@@ -113,6 +119,8 @@ export class DroneOperator {
                 console.log('awaited turnLeftTillRecognize');
             break;
         }
+
+        this._droneFinishedActionCallback();
 
         return true;
     }
