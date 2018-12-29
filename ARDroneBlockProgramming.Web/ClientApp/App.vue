@@ -3,9 +3,7 @@
     <v-navigation-drawer fixed app clipped v-model="navigationDrawer" class="navigation-drower">
       <v-list dense>
 
-        <v-list-tile class="video-stream-container">
-          <img :src="'data:image/png;base64,' + pngBufferBase64">
-        </v-list-tile>
+        <img :src="'data:image/png;base64,' + pngBufferBase64" class="video-stream">
 
         <v-list-tile>
           <v-list-tile-action>
@@ -78,8 +76,13 @@ export default class App extends Vue {
   margin-bottom: 20px;
 }
 
-.video-stream-container {
-  height: 150px;
+.video-stream {
+  width: 100%;
+  padding: 3px;
+}
+
+.recognized-object {
+  border: 3px solid green;
 }
 
 .drone-sees-list {
@@ -99,5 +102,4 @@ export default class App extends Vue {
   background-color: darkgrey;
   outline: 1px solid slategrey;
 }
-
 </style>

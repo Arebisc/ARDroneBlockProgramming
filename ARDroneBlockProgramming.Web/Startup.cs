@@ -53,6 +53,7 @@ namespace ARDroneBlockProgramming.Web
                 {
                     options.ApplicationMaxBufferSize = int.MaxValue;
                     options.TransportMaxBufferSize = int.MaxValue;
+                    options.LongPolling.PollTimeout = new TimeSpan(0, 0, 0, 0, 100);
                 });
             });
 

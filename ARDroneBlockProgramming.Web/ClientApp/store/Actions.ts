@@ -25,7 +25,8 @@ const actions: ActionTree<ManagerState, ManagerState> = {
     },
 
     savePngBuffer({commit, state}, buffer: Uint8Array) {
-        commit('SET_PNG_BUFFER', toBase64(buffer));
+        // commit('SET_PNG_BUFFER', toBase64(buffer));
+        commit('SET_PNG_BUFFER', buffer);
     }
 }
 

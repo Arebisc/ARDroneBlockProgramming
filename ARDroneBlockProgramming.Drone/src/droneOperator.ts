@@ -294,8 +294,9 @@ export class DroneOperator {
             });
         });
     }
-
-    public configurePngStreaming(callback: Function) {
+    
+    public configurePngStream(callback: Function, errorCallback: Function): void {
         this._pngStream.on('data', callback);
+        this._pngStream.on('error', errorCallback);
     }
 }

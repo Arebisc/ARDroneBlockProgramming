@@ -53,8 +53,10 @@ export class SignalRService {
     }
 
     private initVideoStream() {
-        this._droneOperator.configurePngStreaming(async (data) => {
+        this._droneOperator.configurePngStream(async (data) => {
             await this._connection.invoke('PngBufferFromDrone', data);
+        }, (error) => {
+            console.log(error);
         });
     }
 }

@@ -26,7 +26,8 @@ namespace ARDroneBlockProgramming.Web.Hubs
 
         public async Task PngBufferFromDrone(byte[] buffer)
         {
-            await Clients.All.SendAsync("PngBuffer", buffer);
+            var base64Encoded = Convert.ToBase64String(buffer);
+            await Clients.All.SendAsync("PngBuffer", base64Encoded);
         }
     }
 }
