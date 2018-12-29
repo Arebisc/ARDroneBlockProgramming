@@ -1,3 +1,4 @@
+import { ActionType } from './types/actionType';
 import { HubConnectionBuilder, HubConnection } from '@aspnet/signalr';
 import { DroneOperator } from './droneOperator';
 import { DroneAction } from './classes/droneAction';
@@ -11,7 +12,7 @@ export class SignalRService {
     private _droneOperator: DroneOperator;
 
     public constructor() {
-        this._droneOperator = new DroneOperator();
+        this._droneOperator = new DroneOperator(this.recognizedObjectAlert);
     }
 
     public async initSignalR() {
@@ -47,5 +48,9 @@ export class SignalRService {
             let tags = await this._droneOperator.getTagsInDroneRange();
             this._connection.invoke('TagsRecognizedByDrone', tags);
         }, 2000);
+    }
+
+    private async recognizedObjectAlert(objectName: string) {
+        this._connection.invoke('DroneRecognizedObjectFromAction', objectName);
     }
 }

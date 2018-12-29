@@ -9,14 +9,16 @@ export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
+    private _recognizedObjectCallbackAlert: Function;
 
-    public constructor(droneIp: string = "192.168.1.1") {
+    public constructor(recognizedObjectCallback: Function, droneIp: string = "192.168.1.1") {
         this._client = arDrone.createClient({
             ip: droneIp,
         });
 
         this._pngStream = this._client.getPngStream();
         this._computerVision = new ComputerVision("url here", "key here");
+        this._recognizedObjectCallbackAlert = recognizedObjectCallback;
     }
 
     public getNavdata():Promise<DroneNavData> {
@@ -281,6 +283,7 @@ export class DroneOperator {
         console.log(tagsReceived);
         if(tagsReceived.includes(tagToRecognize)){
             console.log('Recognized: ', tagToRecognize);
+            this._recognizedObjectCallbackAlert(tagToRecognize);
             return true;
         }
         
