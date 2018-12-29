@@ -57,6 +57,8 @@ export class DroneOperator {
 
     private async runAction(action: DroneAction) {
         console.log('inside run action');
+
+        this._droneFinishedActionCallback();
         
         switch(action.actionType) {
             case ActionType.Forward:
@@ -119,8 +121,6 @@ export class DroneOperator {
                 console.log('awaited turnLeftTillRecognize');
             break;
         }
-
-        this._droneFinishedActionCallback();
 
         return true;
     }
