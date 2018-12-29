@@ -105,6 +105,10 @@ export default class Home extends Vue {
             this.$store.dispatch('setTagsWhichDroneSees', tags);
         });
 
+        this.signalRConnection.on('AlertRecognizedObject', (recognizedObject) => {
+            
+        })
+
         await this.signalRConnection.start();
     }
 
