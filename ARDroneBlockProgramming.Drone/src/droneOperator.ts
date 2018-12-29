@@ -246,6 +246,11 @@ export class DroneOperator {
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
+            if(droneAction.tag === '') {
+                console.log('No tag provided. Skipping action.');
+                resolve(this._client);
+            }
+
             let tagsInDroneRange = await this.getTagsInDroneRange();
             let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
@@ -266,6 +271,11 @@ export class DroneOperator {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
             let tagsInDroneRange = await this.getTagsInDroneRange();
             let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+
+            if(droneAction.tag === '') {
+                console.log('No tag provided. Skipping action.');
+                resolve(this._client);
+            }
 
             while(!anyTagRecognized) {
                 await this.turnRight(droneAction);
