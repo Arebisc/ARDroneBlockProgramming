@@ -8,14 +8,6 @@
       class="navigation-drower"
     >
       <v-list dense>
-        <v-list-tile @click="$router.push({ name: 'home' })" class="no-underscore">
-          <v-list-tile-action>
-            <v-icon>home</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Strona główna</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>local_see</v-icon>
@@ -24,11 +16,13 @@
             Dron widzi:
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile v-for="(tag, index) in droneSees" :key="index">
-          <v-list-tile-content>
-            {{ tag }}
-          </v-list-tile-content>
-        </v-list-tile>
+        <div class="list__container drone-sees-list">
+          <v-list-tile v-for="(tag, index) in droneSees" :key="index">
+            <v-list-tile-content>
+              {{ tag }}
+            </v-list-tile-content>
+          </v-list-tile>
+        </div>
       </v-list>
 
     </v-navigation-drawer>
@@ -77,10 +71,29 @@ export default class App extends Vue {
 .navigation-drower {
   box-shadow: 10px 0 5px -2px #888;
   -webkit-box-shadow: 10px 0 5px -2px #888;
+  overflow: hidden;
 }
 
 .no-underscore {
   text-decoration: none;
   margin-bottom: 20px;
+}
+
+.drone-sees-list {
+  overflow-y: scroll;
+  height: 50vh;
+}
+
+.drone-sees-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drone-sees-list::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.drone-sees-list::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategray;
 }
 </style>
