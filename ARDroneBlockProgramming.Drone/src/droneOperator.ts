@@ -218,7 +218,7 @@ export class DroneOperator {
             this._client.takeoff(() => {
                 console.log('aftertk');
             });
-            setTimeout(resolve(this._client), delay);
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
@@ -243,7 +243,7 @@ export class DroneOperator {
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
-            if(droneAction.tag === '') {
+            if(!droneAction.tag) {
                 console.log('No tag provided. Skipping action.');
                 resolve(this._client);
             }
@@ -269,7 +269,7 @@ export class DroneOperator {
             let tagsInDroneRange = await this.getTagsInDroneRange();
             let anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-            if(droneAction.tag === '') {
+            if(!droneAction.tag) {
                 console.log('No tag provided. Skipping action.');
                 resolve(this._client);
             }
