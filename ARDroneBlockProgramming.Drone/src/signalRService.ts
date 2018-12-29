@@ -11,19 +11,16 @@ export class SignalRService {
     private _connection: HubConnection;
     private _droneOperator: DroneOperator;
 
-    public constructor() {
-        this._droneOperator = new DroneOperator(this.recognizedObjectAlert, this.actionCompleted);
-    }
-
     public async initSignalR() {
         this._connection = new HubConnectionBuilder()
             .withUrl("http://localhost:5026/droneHub")
             .build();
 
         try {
-            await this._connection.start()
-
+            await this._connection.start();
             this.initConnections();
+            
+            this._droneOperator = new DroneOperator(this._connection);
 
             console.log('Connection started');
         }
@@ -48,13 +45,5 @@ export class SignalRService {
             let tags = await this._droneOperator.getTagsInDroneRange();
             this._connection.invoke('TagsRecognizedByDrone', tags);
         }, 2000);
-    }
-
-    private async recognizedObjectAlert(objectName: string) {
-        this._connection.invoke('DroneRecognizedObjectFromAction', objectName);
-    }
-
-    private actionCompleted() {
-        this._connection.invoke('DroneFinishedOneAction');
     }
 }
