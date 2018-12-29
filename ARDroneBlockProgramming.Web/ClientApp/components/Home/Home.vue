@@ -18,7 +18,8 @@
                     :key="index"
                     :droneAction="element"
                     :index="index"
-                    :arrayContaining="userSelectedActions">
+                    :arrayContaining="userSelectedActions"
+                >
                 </action-tile>
             </draggable>
             <h3>Koniec</h3>
@@ -108,6 +109,8 @@ export default class Home extends Vue {
         this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
             this.snackbarText = "Dron zakończył wykonywanie poleceń";
             this.snackbar = true;
+
+            this.$store.dispatch('resetActionCounter');
         });
 
         this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
@@ -120,6 +123,10 @@ export default class Home extends Vue {
                 this.hideRecognizedObjectAlert();
             }
             this.showRecognizedObjectAlert(recognizedObject);
+        });
+
+        this.signalRConnection.on('DroneFinishedAction', () => {
+            this.$store.dispatch('incrementActionCounter');
         });
 
         await this.signalRConnection.start();

@@ -21,6 +21,14 @@ const actions: ActionTree<ManagerState, ManagerState> = {
 
     setTagsWhichDroneSees({commit, state}, tags: string[]) {
         commit('SET_DRONE_SEES', tags);
+    },
+
+    incrementActionCounter({commit, state}) {
+        commit('INCREMENT_ACTION_COUNTER');
+    },
+
+    resetActionCounter({commit, state}) {
+        commit('RESET_ACTION_COUNTER');
     }
 }
 

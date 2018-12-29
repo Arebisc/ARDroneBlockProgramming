@@ -28,5 +28,10 @@ namespace ARDroneBlockProgramming.Web.Hubs
         {
             await Clients.All.SendAsync("AlertRecognizedObject", recognizedObject);
         }
+
+        public async Task DroneFinishedOneAction()
+        {
+            await Clients.All.SendAsync("DroneFinishedAction");
+        }
     }
 }
