@@ -20,6 +20,10 @@ export default class Navdata extends Vue {
         await this.initializeSignalRConnection();
     }
 
+    async beforeDestroy() {
+        await this.signalRConnection.stop();
+    }
+
     async initializeSignalRConnection() {
         this.signalRConnection = new HubConnectionBuilder()
             .withUrl('/droneHub')
@@ -31,7 +35,7 @@ export default class Navdata extends Vue {
         });
 
         this.signalRConnection.on('DroneSendsNavdata', () => {
-            this.$store.dispatch('incrementActionCounter');
+            this.$store.dispatch('setNavdata');
         });
 
         await this.signalRConnection.start();
