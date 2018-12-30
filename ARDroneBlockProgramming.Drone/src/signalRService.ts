@@ -1,3 +1,4 @@
+import { ActionType } from './types/actionType';
 import { HubConnectionBuilder, HubConnection } from '@aspnet/signalr';
 import { DroneOperator } from './droneOperator';
 import { DroneAction } from './classes/droneAction';
@@ -10,19 +11,16 @@ export class SignalRService {
     private _connection: HubConnection;
     private _droneOperator: DroneOperator;
 
-    public constructor() {
-        this._droneOperator = new DroneOperator();
-    }
-
     public async initSignalR() {
         this._connection = new HubConnectionBuilder()
             .withUrl("http://localhost:5026/droneHub")
             .build();
 
         try {
-            await this._connection.start()
-
+            await this._connection.start();
             this.initConnections();
+            
+            this._droneOperator = new DroneOperator(this._connection);
 
             console.log('Connection started');
         }

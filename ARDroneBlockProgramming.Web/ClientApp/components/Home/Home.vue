@@ -18,7 +18,8 @@
                     :key="index"
                     :droneAction="element"
                     :index="index"
-                    :arrayContaining="userSelectedActions">
+                    :arrayContaining="userSelectedActions"
+                >
                 </action-tile>
             </draggable>
             <h3>Koniec</h3>
@@ -31,13 +32,21 @@
         >
             {{ snackbarText }}
             <v-btn
-            color="pink"
-            flat
-            @click="snackbar = false; snackbarText=''"
-            >
-            Close
+                color="pink"
+                flat
+                @click="snackbar = false; snackbarText=''"
+                >
+                Close
             </v-btn>
-      </v-snackbar>
+        </v-snackbar>
+        <v-alert
+            :value="recognizedObjectAlert"
+            type="success"
+            transition="scale-transition"
+            class="custom-alert"
+            >
+            {{ "Rozpoznano: " + recognizedObject }}
+        </v-alert>
     </v-layout>
 </template>
 
@@ -85,6 +94,8 @@ export default class Home extends Vue {
 
     signalRConnection!: HubConnection;
 
+    recognizedObjectAlert: boolean = false;
+    recognizedObject: string = "";
 
     async created() {
         await this.initializeSignalRConnection();
@@ -98,11 +109,24 @@ export default class Home extends Vue {
         this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
             this.snackbarText = "Dron zakończył wykonywanie poleceń";
             this.snackbar = true;
+
+            this.$store.dispatch('resetActionCounter');
         });
 
         this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
             console.log(tags);
             this.$store.dispatch('setTagsWhichDroneSees', tags);
+        });
+
+        this.signalRConnection.on('AlertRecognizedObject', (recognizedObject) => {
+            if(this.recognizedObjectAlert) {
+                this.hideRecognizedObjectAlert();
+            }
+            this.showRecognizedObjectAlert(recognizedObject);
+        });
+
+        this.signalRConnection.on('DroneFinishedAction', () => {
+            this.$store.dispatch('incrementActionCounter');
         });
 
         await this.signalRConnection.start();
@@ -133,6 +157,20 @@ export default class Home extends Vue {
         catch(error) {
             console.log(error);
         }
+    }
+
+    showRecognizedObjectAlert(recognizedObject: string) {
+        this.recognizedObjectAlert = true;
+        this.recognizedObject = recognizedObject;
+
+        setTimeout(() => {
+            this.hideRecognizedObjectAlert();
+        }, 3000);
+    }
+
+    hideRecognizedObjectAlert() {
+        this.recognizedObjectAlert = false;
+        this.recognizedObject = "";
     }
 }
 </script>
@@ -172,5 +210,12 @@ export default class Home extends Vue {
     color: #979797;
     font-size: 15px;
     font-weight: bold;
+}
+
+.custom-alert {
+    position: fixed;
+    top: 6%;
+    width: 22%;
+    margin-left: 45%;
 }
 </style>

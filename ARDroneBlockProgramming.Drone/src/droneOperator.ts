@@ -1,3 +1,4 @@
+import { HubConnection } from '@aspnet/signalr';
 import { DroneAction } from './classes/droneAction';
 import * as arDrone from 'ar-drone';
 import { ActionType } from './Types/ActionType';
@@ -10,7 +11,10 @@ export class DroneOperator {
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
 
-    public constructor(droneIp: string = "192.168.1.1") {
+    public constructor(
+        private _hubConnection: HubConnection,
+        droneIp: string = "192.168.1.1") 
+        {
         this._client = arDrone.createClient({
             ip: droneIp,
         });
@@ -36,22 +40,22 @@ export class DroneOperator {
         await this.takeOff();
         await this.stop();
 
-        return new Promise<boolean>(async (resolve, reject) => {
-            console.log('droneActions: ' + droneActions.length);
-            
-            for (let i: number = 0; i < droneActions.length; i++ ) {
-                await this.runAction(droneActions[i]);
-                await this.stop();
-            }
-            console.log('outside actions foreach');
-            await this.land();
+        console.log('droneActions: ' + droneActions.length);
+        
+        for (let i: number = 0; i < droneActions.length; i++ ) {
+            await this.runAction(droneActions[i]);
+            await this.stop();
+        }
+        console.log('outside actions foreach');
+        await this.land();
 
-            resolve(true);
-        });
+        return true;
     }
 
     private async runAction(action: DroneAction) {
         console.log('inside run action');
+
+        this.actionCompletedAlert();
         
         switch(action.actionType) {
             case ActionType.Forward:
@@ -198,7 +202,7 @@ export class DroneOperator {
         });
     }
 
-    private async stop() : Promise<arDrone.Client> {
+    private async stop(): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('stop');
             this._client.stop();
@@ -214,16 +218,17 @@ export class DroneOperator {
             this._client.takeoff(() => {
                 console.log('aftertk');
             });
-            setTimeout(resolve(this._client), delay);
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
-    private async land(): Promise<arDrone.Client> {
+    private async land(delay: number = 3000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('land');
             this._client.land(() => {
-                resolve(this._client);
+                console.log('after land');
             });
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
@@ -238,39 +243,45 @@ export class DroneOperator {
     }
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>(async (resolve, reject) => {
-            let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+        if(!droneAction.tag) {
+            console.log('No tag provided. Skipping action.');
+            return this._client;
+        }
 
-            while(!anyTagRecognized) {
-                await this.turnLeft(droneAction);
-                await this.stop();
-                await this.wait(1000);
+        let tagsInDroneRange = await this.getTagsInDroneRange();
+        let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-                tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
-            }
+        while(!anyTagRecognized) {
+            await this.turnLeft(droneAction);
+            await this.stop();
+            await this.wait(1000);
 
-            resolve(this._client);
-        });
+            tagsInDroneRange = await this.getTagsInDroneRange();
+            anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        }
+
+        return this._client;
     }
 
     private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>(async (resolve, reject) => {
-            let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+        let tagsInDroneRange = await this.getTagsInDroneRange();
+        let anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-            while(!anyTagRecognized) {
-                await this.turnRight(droneAction);
-                await this.stop();
-                await this.wait(1000);
+        if(!droneAction.tag) {
+            console.log('No tag provided. Skipping action.');
+            return this._client;
+        }
 
-                tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
-            }
+        while(!anyTagRecognized) {
+            await this.turnRight(droneAction);
+            await this.stop();
+            await this.wait(1000);
 
-            resolve(this._client);
-        });
+            tagsInDroneRange = await this.getTagsInDroneRange();
+            anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        }
+
+        return this._client;
     }
 
     public async getTagsInDroneRange() {
@@ -280,10 +291,11 @@ export class DroneOperator {
         return tagsReceived;
     }
 
-    private tagRecognized(tagToRecognize: string, tagsReceived: string[]): boolean {
+    private async tagRecognized(tagToRecognize: string, tagsReceived: string[]): Promise<boolean> {
         console.log(tagsReceived);
         if(tagsReceived.includes(tagToRecognize)){
             console.log('Recognized: ', tagToRecognize);
+            await this.recognizedObjectAlert(tagToRecognize);
             return true;
         }
         
@@ -296,5 +308,13 @@ export class DroneOperator {
                 resolve(data);
             });
         });
+    }
+
+    private async recognizedObjectAlert(objectName: string) {
+        await this._hubConnection.invoke('DroneRecognizedObjectFromAction', objectName);
+    }
+
+    private async actionCompletedAlert() {
+        await this._hubConnection.invoke('DroneFinishedOneAction');
     }
 }
