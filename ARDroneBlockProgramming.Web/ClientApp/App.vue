@@ -8,6 +8,24 @@
       class="navigation-drower"
     >
       <v-list dense>
+        <v-list-tile @click="$router.push({ name: 'home' })" class="router-link">
+          <v-list-tile-action>
+            <v-icon>home</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            Strona główna:
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list-tile @click="$router.push({ name: 'navdata' })" class="router-link">
+          <v-list-tile-action>
+            <v-icon>gps_fixed</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            Dane nawigacyjne:
+          </v-list-tile-content>
+        </v-list-tile>
+
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>local_see</v-icon>
