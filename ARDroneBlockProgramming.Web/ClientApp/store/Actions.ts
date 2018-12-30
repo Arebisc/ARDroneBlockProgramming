@@ -1,3 +1,4 @@
+import { DroneNavData } from './../Helpers/DroneNavdata';
 import { DroneAction } from './../classes/DroneAction';
 import { ActionTree } from 'vuex';
 import { ManagerState } from './ManagerState';
@@ -29,6 +30,10 @@ const actions: ActionTree<ManagerState, ManagerState> = {
 
     resetActionCounter({commit, state}) {
         commit('RESET_ACTION_COUNTER');
+    },
+
+    setNavdata({commit, state}, navdata: DroneNavData) {
+        commit('SET_NAVDATA', navdata);
     }
 }
 
