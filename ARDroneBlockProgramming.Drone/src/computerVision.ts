@@ -2,18 +2,25 @@ import * as request from 'request';
 import { IApiJsonResponse, IApiMetadata, ITag } from './interfaces/computerVision';
 
 export class ComputerVision {
-    
-    public constructor(
-        private _url: string = "", 
-        private _key: string = "") 
-    { }
+    private _key: string = "";
+    private _url: string = "";
+
+    public constructor(url: string, key: string) {
+        this._url = url;
+        this._key = key;
+    }
 
     public async getImageTags(image: object, predictionThreshold: number = 0.75): Promise<Array<string>> {
         let tags = new Array<string>();
 
         try {
             let apiResponse = await this.postImage(image) as IApiJsonResponse;
-            tags = apiRsponse.tags.filter(n => n.confidence > predictionThreshold);
+
+            for(let i = 0; i < apiResponse.tags.length; i++) {
+                if(apiResponse.tags[i].confidence > predictionThreshold) {
+                    tags.push(apiResponse.tags[i].name);
+                }
+            }
         }
         catch(e) {
             console.log(e);
@@ -28,7 +35,8 @@ export class ComputerVision {
 
         return new Promise((resolve, reject) => {
             request.post(options, (error, response, body) => {
-                resolve(JSON.parse(body));
+                let jsonResponse = JSON.parse(body);
+                resolve(jsonResponse);
             });
         });
     }
