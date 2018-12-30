@@ -101,6 +101,10 @@ export default class Home extends Vue {
         await this.initializeSignalRConnection();
     }
 
+    async beforeDestroy() {
+        await this.signalRConnection.stop();
+    }
+
     async initializeSignalRConnection() {
         this.signalRConnection = new HubConnectionBuilder()
             .withUrl('/droneHub')
