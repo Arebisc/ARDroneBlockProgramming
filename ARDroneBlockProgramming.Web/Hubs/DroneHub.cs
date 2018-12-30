@@ -1,4 +1,5 @@
-﻿using ARDroneBlockProgramming.Web.ViewModels;
+﻿using ARDroneBlockProgramming.Web.DroneNavdataHelpers;
+using ARDroneBlockProgramming.Web.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,11 @@ namespace ARDroneBlockProgramming.Web.Hubs
         public async Task DroneFinishedOneAction()
         {
             await Clients.All.SendAsync("DroneFinishedAction");
+        }
+
+        public async Task NavdataFromDrone(DroneNavdata droneNavdata)
+        {
+            await Clients.All.SendAsync("DroneSendsNavdata", droneNavdata);
         }
     }
 }
