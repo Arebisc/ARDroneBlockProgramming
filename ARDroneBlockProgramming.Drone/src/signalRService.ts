@@ -1,7 +1,6 @@
-import { ActionType } from './types/actionType';
 import { HubConnectionBuilder, HubConnection } from '@aspnet/signalr';
-import { DroneOperator } from './droneOperator';
 import { DroneAction } from './classes/droneAction';
+import { DroneOperator } from './droneOperator';
 
 (<any>global).XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 (<any>global).WebSocket = require("websocket").w3cwebsocket;
@@ -21,6 +20,7 @@ export class SignalRService {
             this.initConnections();
             
             this._droneOperator = new DroneOperator(this._connection);
+            this.initDroneSendingNavdata();
 
             console.log('Connection started');
         }
@@ -45,5 +45,12 @@ export class SignalRService {
             let tags = await this._droneOperator.getTagsInDroneRange();
             this._connection.invoke('TagsRecognizedByDrone', tags);
         }, 2000);
+    }
+
+    public async initDroneSendingNavdata() {
+        setInterval(async () => {
+            let navdata = await this._droneOperator.getNavdata();
+            this._connection.invoke('NavdataFromDrone', navdata);
+        }, 1000);
     }
 }

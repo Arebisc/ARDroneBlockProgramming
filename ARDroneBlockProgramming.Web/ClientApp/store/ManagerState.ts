@@ -7,5 +7,5 @@ export class ManagerState {
     droneActions: Array<DroneAction> =  [];
     droneSees: string[] = [];
     droneActionStateCounter: number = 0;
-    droneNavdata!: DroneNavData;
+    droneNavdata: DroneNavData = {};
 }

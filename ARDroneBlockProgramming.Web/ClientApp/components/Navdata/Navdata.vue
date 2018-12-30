@@ -34,8 +34,8 @@ export default class Navdata extends Vue {
             this.$store.dispatch('setTagsWhichDroneSees', tags);
         });
 
-        this.signalRConnection.on('DroneSendsNavdata', () => {
-            this.$store.dispatch('setNavdata');
+        this.signalRConnection.on('DroneSendsNavdata', (navdata) => {
+            this.$store.dispatch('setNavdata', navdata);
         });
 
         await this.signalRConnection.start();
