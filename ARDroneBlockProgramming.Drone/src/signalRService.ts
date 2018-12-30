@@ -50,7 +50,7 @@ export class SignalRService {
     public async initDroneSendingNavdata() {
         setInterval(async () => {
             let navdata = await this._droneOperator.getNavdata();
-            this._connection.invoke('NavdataFromDrone', navdata);
+            await this._connection.invoke('NavdataFromDrone', navdata);
         }, 1000);
     }
 }
