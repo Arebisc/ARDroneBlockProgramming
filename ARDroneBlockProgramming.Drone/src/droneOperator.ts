@@ -37,18 +37,16 @@ export class DroneOperator {
         await this.takeOff();
         await this.stop();
 
-        return new Promise<boolean>(async (resolve, reject) => {
-            console.log('droneActions: ' + droneActions.length);
-            
-            for (let i: number = 0; i < droneActions.length; i++ ) {
-                await this.runAction(droneActions[i]);
-                await this.stop();
-            }
-            console.log('outside actions foreach');
-            await this.land();
+        console.log('droneActions: ' + droneActions.length);
+        
+        for (let i: number = 0; i < droneActions.length; i++ ) {
+            await this.runAction(droneActions[i]);
+            await this.stop();
+        }
+        console.log('outside actions foreach');
+        await this.land();
 
-            resolve(true);
-        });
+        return true;
     }
 
     private async runAction(action: DroneAction) {
@@ -201,7 +199,7 @@ export class DroneOperator {
         });
     }
 
-    private async stop() : Promise<arDrone.Client> {
+    private async stop(): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('stop');
             this._client.stop();
@@ -241,49 +239,45 @@ export class DroneOperator {
     }
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>(async (resolve, reject) => {
-            if(!droneAction.tag) {
-                console.log('No tag provided. Skipping action.');
-                resolve(this._client);
-            }
+        if(!droneAction.tag) {
+            console.log('No tag provided. Skipping action.');
+            return this._client;
+        }
 
-            let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+        let tagsInDroneRange = await this.getTagsInDroneRange();
+        let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-            while(!anyTagRecognized) {
-                await this.turnLeft(droneAction);
-                await this.stop();
-                await this.wait(1000);
+        while(!anyTagRecognized) {
+            await this.turnLeft(droneAction);
+            await this.stop();
+            await this.wait(1000);
 
-                tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
-            }
+            tagsInDroneRange = await this.getTagsInDroneRange();
+            anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        }
 
-            resolve(this._client);
-        });
+        return this._client;
     }
 
     private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>(async (resolve, reject) => {
-            let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange);
+        let tagsInDroneRange = await this.getTagsInDroneRange();
+        let anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-            if(!droneAction.tag) {
-                console.log('No tag provided. Skipping action.');
-                resolve(this._client);
-            }
+        if(!droneAction.tag) {
+            console.log('No tag provided. Skipping action.');
+            return this._client;
+        }
 
-            while(!anyTagRecognized) {
-                await this.turnRight(droneAction);
-                await this.stop();
-                await this.wait(1000);
+        while(!anyTagRecognized) {
+            await this.turnRight(droneAction);
+            await this.stop();
+            await this.wait(1000);
 
-                tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange)
-            }
+            tagsInDroneRange = await this.getTagsInDroneRange();
+            anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        }
 
-            resolve(this._client);
-        });
+        return this._client;
     }
 
     public async getTagsInDroneRange() {
