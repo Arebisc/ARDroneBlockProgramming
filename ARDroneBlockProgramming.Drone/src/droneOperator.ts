@@ -219,12 +219,13 @@ export class DroneOperator {
         });
     }
 
-    private async land(): Promise<arDrone.Client> {
+    private async land(delay: number = 3000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('land');
             this._client.land(() => {
-                resolve(this._client);
+                console.log('after land');
             });
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
