@@ -1,3 +1,4 @@
+import { HubConnection } from '@aspnet/signalr';
 import { DroneAction } from './classes/droneAction';
 import * as arDrone from 'ar-drone';
 import { ActionType } from './Types/ActionType';
@@ -9,14 +10,18 @@ export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
+    private _hubConnection: HubConnection;
 
-    public constructor(droneIp: string = "192.168.1.1") {
+    public constructor(hubConnection: HubConnection,
+        droneIp: string = "192.168.1.1") 
+        {
         this._client = arDrone.createClient({
             ip: droneIp,
         });
 
         this._pngStream = this._client.getPngStream();
         this._computerVision = new ComputerVision("url here", "key here");
+        this._hubConnection = hubConnection;
     }
 
     public getNavdata():Promise<DroneNavData> {
@@ -49,6 +54,8 @@ export class DroneOperator {
 
     private async runAction(action: DroneAction) {
         console.log('inside run action');
+
+        this.actionCompletedAlert();
         
         switch(action.actionType) {
             case ActionType.Forward:
@@ -211,7 +218,7 @@ export class DroneOperator {
             this._client.takeoff(() => {
                 console.log('aftertk');
             });
-            setTimeout(resolve(this._client), delay);
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
@@ -236,6 +243,11 @@ export class DroneOperator {
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
+            if(!droneAction.tag) {
+                console.log('No tag provided. Skipping action.');
+                resolve(this._client);
+            }
+
             let tagsInDroneRange = await this.getTagsInDroneRange();
             let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
@@ -255,7 +267,12 @@ export class DroneOperator {
     private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
         return new Promise<arDrone.Client>(async (resolve, reject) => {
             let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+            let anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange);
+
+            if(!droneAction.tag) {
+                console.log('No tag provided. Skipping action.');
+                resolve(this._client);
+            }
 
             while(!anyTagRecognized) {
                 await this.turnRight(droneAction);
@@ -263,7 +280,7 @@ export class DroneOperator {
                 await this.wait(1000);
 
                 tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
+                anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange)
             }
 
             resolve(this._client);
@@ -277,10 +294,11 @@ export class DroneOperator {
         return tagsReceived;
     }
 
-    private tagRecognized(tagToRecognize: string, tagsReceived: string[]): boolean {
+    private async tagRecognized(tagToRecognize: string, tagsReceived: string[]): Promise<boolean> {
         console.log(tagsReceived);
         if(tagsReceived.includes(tagToRecognize)){
             console.log('Recognized: ', tagToRecognize);
+            await this.recognizedObjectAlert(tagToRecognize);
             return true;
         }
         
@@ -293,5 +311,13 @@ export class DroneOperator {
                 resolve(data);
             });
         });
+    }
+
+    private async recognizedObjectAlert(objectName: string) {
+        await this._hubConnection.invoke('DroneRecognizedObjectFromAction', objectName);
+    }
+
+    private async actionCompletedAlert() {
+        await this._hubConnection.invoke('DroneFinishedOneAction');
     }
 }
