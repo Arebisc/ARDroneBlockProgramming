@@ -127,7 +127,7 @@ declare module 'ar-drone' {
 
     export function createPngStream(options: any): any;
 
-    export function createUdpControl(options: any): UdpControl;
+    export function createUdpControl(options?: any): UdpControl;
 
     export function createUdpNavdataStream(options: any): any;
 

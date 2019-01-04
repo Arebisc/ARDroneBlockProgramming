@@ -10,6 +10,11 @@ export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
+    private _udpControl: arDrone.UdpControl;
+
+    private EMERGENCY_BIT_POSITION: number = 8;
+    
+    public emergencyStopFlag: boolean = false;
 
     public constructor(
         private _hubConnection: HubConnection,
@@ -21,8 +26,9 @@ export class DroneOperator {
 
         this._pngStream = this._client.getPngStream();
         this._client.config('general:navdata_demo', 'FALSE', (data) => {
-            console.log('callback');
+            console.log('general:navdata_demo callback');
         });
+        this._udpControl = arDrone.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
     }
 
@@ -300,6 +306,16 @@ export class DroneOperator {
         }
         
         return false;
+    }
+
+    public emergencyStop() {
+        this._udpControl.raw("REF", (1 << this.EMERGENCY_BIT_POSITION));
+        this._udpControl.flush();
+    }
+
+    public emergencyStopReset() {
+        this._udpControl.raw("REF", (0 << this.EMERGENCY_BIT_POSITION));
+        this._udpControl.flush();
     }
 
     public async takePhoto() :Promise<object> {
