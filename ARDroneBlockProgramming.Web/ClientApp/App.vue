@@ -4,7 +4,6 @@
       fixed
       app
       clipped
-      v-model="navigationDrawer"
       class="navigation-drower"
     >
       <v-list dense>
@@ -93,8 +92,29 @@
       <v-container fluid fill-height>
         <v-layout>
           <v-flex text-xs-center>
-            <router-view></router-view>
+            <router-view :signalRConnection="signalRConnection"></router-view>
           </v-flex>
+          <v-snackbar
+            v-model="snackbar"
+            bottom
+          >
+            {{ snackbarText }}
+            <v-btn
+                color="pink"
+                flat
+                @click="snackbar = false; snackbarText=''"
+                >
+                Close
+            </v-btn>
+          </v-snackbar>
+          <v-alert
+              :value="recognizedObjectAlert"
+              type="success"
+              transition="scale-transition"
+              class="custom-alert"
+              >
+              {{ "Rozpoznano: " + recognizedObject }}
+          </v-alert>
         </v-layout>
       </v-container>
     </v-content>
@@ -108,6 +128,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { mapGetters } from 'vuex';
+import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 
 @Component({
   computed: {
@@ -117,10 +138,71 @@ import { mapGetters } from 'vuex';
   }
 })
 export default class App extends Vue {
-  navigationDrawer: boolean = true;
   tagsInDroneRange: string[] = new Array();
   restrictionsSwitch: boolean = false;
   restrictionsInput: number = 0;
+
+  snackbar = false;
+  snackbarText = "";
+  
+  signalRConnection!: HubConnection;
+
+  recognizedObjectAlert: boolean = false;
+  recognizedObject: string = "";
+
+  async created() {
+    await this.initializeSignalRConnection();
+  }
+
+  async beforeDestroy() {
+    await this.signalRConnection.stop();
+  }
+
+  async initializeSignalRConnection() {
+    this.signalRConnection = new HubConnectionBuilder()
+        .withUrl('/droneHub')
+        .build();
+
+    this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
+        this.snackbarText = "Dron zakończył wykonywanie poleceń";
+        this.snackbar = true;
+
+        this.$store.dispatch('resetActionCounter');
+    });
+
+    this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
+        console.log(tags);
+        this.$store.dispatch('setTagsWhichDroneSees', tags);
+    });
+
+    this.signalRConnection.on('AlertRecognizedObject', (recognizedObject) => {
+        if(this.recognizedObjectAlert) {
+            this.hideRecognizedObjectAlert();
+        }
+        this.showRecognizedObjectAlert(recognizedObject);
+    });
+
+    this.signalRConnection.on('DroneFinishedAction', () => {
+        this.$store.dispatch('incrementActionCounter');
+    });
+
+    await this.signalRConnection.start();
+  }
+
+  showRecognizedObjectAlert(recognizedObject: string) {
+    this.recognizedObjectAlert = true;
+    this.recognizedObject = recognizedObject;
+
+    setTimeout(() => {
+        this.hideRecognizedObjectAlert();
+    }, 3000);
+  }
+
+  hideRecognizedObjectAlert() {
+      this.recognizedObjectAlert = false;
+      this.recognizedObject = "";
+  }
+
 }
 
 </script>
@@ -166,5 +248,12 @@ export default class App extends Vue {
 .restrictions-distance__input{
   width: 45px;
   margin-left: 13px;
+}
+
+.custom-alert {
+  position: fixed;
+  top: 6%;
+  width: 22%;
+  margin-left: 45%;
 }
 </style>

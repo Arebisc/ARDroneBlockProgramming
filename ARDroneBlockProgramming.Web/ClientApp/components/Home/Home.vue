@@ -26,39 +26,19 @@
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
             <v-btn type="button" @click="sendActions" color="info">Wykonaj akcje</v-btn>
         </v-flex>
-        <v-snackbar
-            v-model="snackbar"
-            bottom
-        >
-            {{ snackbarText }}
-            <v-btn
-                color="pink"
-                flat
-                @click="snackbar = false; snackbarText=''"
-                >
-                Close
-            </v-btn>
-        </v-snackbar>
-        <v-alert
-            :value="recognizedObjectAlert"
-            type="success"
-            transition="scale-transition"
-            class="custom-alert"
-            >
-            {{ "Rozpoznano: " + recognizedObject }}
-        </v-alert>
     </v-layout>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+// @ts-ignore
 import draggable from 'vuedraggable';
 import { DroneAction } from '../../classes/DroneAction';
 import ActionTileComponent from './ActionTile.vue';
 import { ActionType } from './../../types/ActionType';
 import { AxiosResponse } from 'axios';
-import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+import { HubConnection } from '@aspnet/signalr';
 
 
 @Component({
@@ -68,6 +48,9 @@ import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
     }
 })
 export default class Home extends Vue {
+    // @ts-ignore
+    @Prop(HubConnection) signalRConnection!: HubConnection;
+
     actionsContainerOptions = {
         group: {
             name: 'drone-actions-group',
@@ -76,9 +59,6 @@ export default class Home extends Vue {
         },
         sort: false
     };
-
-    snackbar = false;
-    snackbarText = "";
 
     droneActions: DroneAction[] = [
         new DroneAction('Do góry', ActionType.Up),
@@ -91,50 +71,6 @@ export default class Home extends Vue {
         new DroneAction('Obracaj w lewo póki nie napotkasz: ', ActionType.TurnLeftTillRecognize)
     ];
     userSelectedActions: DroneAction[] = [];
-
-    signalRConnection!: HubConnection;
-
-    recognizedObjectAlert: boolean = false;
-    recognizedObject: string = "";
-
-    async created() {
-        await this.initializeSignalRConnection();
-    }
-
-    async beforeDestroy() {
-        await this.signalRConnection.stop();
-    }
-
-    async initializeSignalRConnection() {
-        this.signalRConnection = new HubConnectionBuilder()
-            .withUrl('/droneHub')
-            .build();
-
-        this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
-            this.snackbarText = "Dron zakończył wykonywanie poleceń";
-            this.snackbar = true;
-
-            this.$store.dispatch('resetActionCounter');
-        });
-
-        this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
-            console.log(tags);
-            this.$store.dispatch('setTagsWhichDroneSees', tags);
-        });
-
-        this.signalRConnection.on('AlertRecognizedObject', (recognizedObject) => {
-            if(this.recognizedObjectAlert) {
-                this.hideRecognizedObjectAlert();
-            }
-            this.showRecognizedObjectAlert(recognizedObject);
-        });
-
-        this.signalRConnection.on('DroneFinishedAction', () => {
-            this.$store.dispatch('incrementActionCounter');
-        });
-
-        await this.signalRConnection.start();
-    }
 
     customClone(originalAction: DroneAction): DroneAction {
         return new DroneAction(originalAction.actionLabel, originalAction.actionType, originalAction.speed, originalAction.duration);
@@ -161,20 +97,6 @@ export default class Home extends Vue {
         catch(error) {
             console.log(error);
         }
-    }
-
-    showRecognizedObjectAlert(recognizedObject: string) {
-        this.recognizedObjectAlert = true;
-        this.recognizedObject = recognizedObject;
-
-        setTimeout(() => {
-            this.hideRecognizedObjectAlert();
-        }, 3000);
-    }
-
-    hideRecognizedObjectAlert() {
-        this.recognizedObjectAlert = false;
-        this.recognizedObject = "";
     }
 }
 </script>
@@ -214,12 +136,5 @@ export default class Home extends Vue {
     color: #979797;
     font-size: 15px;
     font-weight: bold;
-}
-
-.custom-alert {
-    position: fixed;
-    top: 6%;
-    width: 22%;
-    margin-left: 45%;
 }
 </style>
