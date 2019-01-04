@@ -46,6 +46,48 @@
     </v-navigation-drawer>
     <v-toolbar color="indigo" fixed app clipped-left light>
       <v-toolbar-title class="main-title">ARDrone blokowe programowanie</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-items class="white--text">
+        <v-tooltip class="restrictions-switch__container"
+          close-delay="1000"
+          bottom
+          flat
+          >
+          <v-switch
+            label="Tryb z ograniczeniami"
+            v-model="restrictionsSwitch"
+            slot="activator"
+          ></v-switch>
+          <span>
+            Tryb ten ogranicza zasięg (od miejsca wystartowania) drona do wartości zdefiniowanej po lewej stronie. 
+            Jeżeli w trakcie misji maszyna przekroczy te wartość - to misja zostanie przerwana i dron zawiśnie bezczynnie w powietrzu.
+          </span>
+        </v-tooltip>
+        <v-tooltip
+          close-delay="1000"
+          bottom
+          flat
+          >
+          <v-text-field flat class="restrictions-distance__input" v-model="restrictionsInput" slot="activator" box></v-text-field>
+          <span>Odległość graniczna jakiej nie może dron przekroczyć (w metrach).</span>
+        </v-tooltip>
+        <v-tooltip
+          close-delay="1000"
+          bottom
+          flat
+          >
+          <v-btn flat slot="activator" >Przerwij i wyląduj</v-btn>
+          <span>W dowolnym momencie możesz przerwać misję. Dron natychmiast wyląduje na ziemi.</span>
+        </v-tooltip>
+        <v-tooltip
+          close-delay="1000"
+          bottom
+          flat
+          >
+          <v-btn flat slot="activator" class="red--text">Wyłącz napędy</v-btn>
+          <span>W dowolnym momencie lotu, możesz wyłączyć napędy. UWAGA! Dron opadnie bezwładnie na ziemię. Może to spowodować jego uszkodzenie.</span>
+        </v-tooltip>
+      </v-toolbar-items>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
@@ -77,6 +119,8 @@ import { mapGetters } from 'vuex';
 export default class App extends Vue {
   navigationDrawer: boolean = true;
   tagsInDroneRange: string[] = new Array();
+  restrictionsSwitch: boolean = false;
+  restrictionsInput: number = 0;
 }
 
 </script>
@@ -113,5 +157,14 @@ export default class App extends Vue {
 .drone-sees-list::-webkit-scrollbar-thumb {
   background-color: darkgrey;
   outline: 1px solid slategray;
+}
+
+.restrictions-switch__container {
+  margin-top: 18px;
+}
+
+.restrictions-distance__input{
+  width: 45px;
+  margin-left: 13px;
 }
 </style>
