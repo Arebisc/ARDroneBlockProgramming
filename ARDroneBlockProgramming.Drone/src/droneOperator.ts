@@ -14,7 +14,8 @@ export class DroneOperator {
 
     private EMERGENCY_BIT_POSITION: number = 8;
     
-    public emergencyStopFlag: boolean = false;
+    private droneStopped: boolean = false;
+    private forcedLanding: boolean = false;
 
     public constructor(
         private _hubConnection: HubConnection,
@@ -49,7 +50,25 @@ export class DroneOperator {
         console.log('droneActions: ' + droneActions.length);
         
         for (let i: number = 0; i < droneActions.length; i++ ) {
-            await this.runAction(droneActions[i]);
+
+            if(this.forcedLanding) {
+                this.forcedLanding = false;
+                console.log('Loop breaked before run action');
+                break;
+            }
+
+            var result = await this.runAction(droneActions[i]);
+            
+            if(result !== true ) {
+                return false;
+            }
+
+            if(this.forcedLanding) {
+                this.forcedLanding = false;
+                console.log('Loop breaked after run action');
+                break;
+            }
+
             await this.stop();
         }
         console.log('outside actions foreach');
@@ -58,8 +77,12 @@ export class DroneOperator {
         return true;
     }
 
-    private async runAction(action: DroneAction) {
+    private async runAction(action: DroneAction): Promise<boolean> {
         console.log('inside run action');
+
+        if(this.isDroneStopped()) {
+            return false;
+        }
 
         this.actionCompletedAlert();
         
@@ -258,6 +281,11 @@ export class DroneOperator {
         let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
         while(!anyTagRecognized) {
+
+            if(this.forcedLanding) {
+                return this._client;
+            }
+
             await this.turnLeft(droneAction);
             await this.stop();
             await this.wait(1000);
@@ -279,6 +307,10 @@ export class DroneOperator {
         }
 
         while(!anyTagRecognized) {
+            if(this.forcedLanding) {
+                return this._client;
+            }
+
             await this.turnRight(droneAction);
             await this.stop();
             await this.wait(1000);
@@ -308,17 +340,27 @@ export class DroneOperator {
         return false;
     }
 
-    public emergencyStop() {
+    public disableDroneMotors() {
+        console.log('Disable drone motors');
         this._udpControl.raw("REF", (1 << this.EMERGENCY_BIT_POSITION));
         this._udpControl.flush();
+
+        this.droneStopped = true;
     }
 
     public emergencyStopReset() {
+        console.log('Emergency stop reset');
         this._udpControl.raw("REF", (0 << this.EMERGENCY_BIT_POSITION));
         this._udpControl.flush();
+
+        this.droneStopped = false;
     }
 
-    public async takePhoto() :Promise<object> {
+    public breakActions() {
+
+    }
+
+    public async takePhoto(): Promise<object> {
         return new Promise<object>((resolve, reject) => {
             this._pngStream.once('data', function (data) {
                 resolve(data);
@@ -332,5 +374,14 @@ export class DroneOperator {
 
     private async actionCompletedAlert() {
         await this._hubConnection.invoke('DroneFinishedOneAction');
+    }
+
+    private isDroneStopped(): boolean {
+        return this.droneStopped == true;
+    }
+
+    public async forceLand(): Promise<void> {
+        await this.stop();
+        this.forcedLanding = true;
     }
 }

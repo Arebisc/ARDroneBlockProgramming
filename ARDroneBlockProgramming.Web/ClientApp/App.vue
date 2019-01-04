@@ -75,7 +75,7 @@
           bottom
           flat
           >
-          <v-btn flat slot="activator" >Przerwij i wyląduj</v-btn>
+          <v-btn flat slot="activator" @click="stopAndLand()">Przerwij i wyląduj</v-btn>
           <span>W dowolnym momencie możesz przerwać misję. Dron natychmiast wyląduje na ziemi.</span>
         </v-tooltip>
         <v-tooltip
@@ -83,7 +83,7 @@
           bottom
           flat
           >
-          <v-btn flat slot="activator">Resetuj zatrzymanie drona</v-btn>
+          <v-btn flat slot="activator" @click="resetDroneStopState()">Resetuj zatrzymanie drona</v-btn>
           <span>Jeżeli zatrzymałeś drona, lub zatrzymałeś silniki - musisz przywrócić jego funkcjonalność.</span>
         </v-tooltip>
         <v-tooltip
@@ -91,7 +91,7 @@
           bottom
           flat
           >
-          <v-btn flat slot="activator" class="red--text">Wyłącz napędy</v-btn>
+          <v-btn flat slot="activator" class="red--text" @click="disableDroneMotors()">Wyłącz napędy</v-btn>
           <span>W dowolnym momencie lotu, możesz wyłączyć napędy. UWAGA! Dron opadnie bezwładnie na ziemię. Może to spowodować jego uszkodzenie.</span>
         </v-tooltip>
       </v-toolbar-items>
@@ -122,6 +122,14 @@
               class="custom-alert"
               >
               {{ "Rozpoznano: " + recognizedObject }}
+          </v-alert>
+          <v-alert
+              :value="errorText"
+              type="error"
+              transition="scale-transition"
+              class="custom-alert"
+              >
+              {{ errorText }}
           </v-alert>
         </v-layout>
       </v-container>
@@ -158,6 +166,9 @@ export default class App extends Vue {
   recognizedObjectAlert: boolean = false;
   recognizedObject: string = "";
 
+  errorTextAlert: boolean = false;
+  errorText: string = "";
+
   async created() {
     await this.initializeSignalRConnection();
   }
@@ -171,6 +182,12 @@ export default class App extends Vue {
         .withUrl('/droneHub')
         .build();
 
+    this.initializeSignalREvents();
+
+    await this.signalRConnection.start();
+  }
+
+  initializeSignalREvents() {
     this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
         this.snackbarText = "Dron zakończył wykonywanie poleceń";
         this.snackbar = true;
@@ -194,12 +211,18 @@ export default class App extends Vue {
         this.$store.dispatch('incrementActionCounter');
     });
 
-    await this.signalRConnection.start();
+    this.signalRConnection.on('SendDroneFinishedActionsWithErrorsToClient', () => {
+      if(this.errorTextAlert) {
+        this.hideErrorAlert();
+      }
+
+      this.showError("Misja przerwana! Pamiętaj o odblokowaniu drona przed kolejną.");
+    });
   }
 
   showRecognizedObjectAlert(recognizedObject: string) {
-    this.recognizedObjectAlert = true;
     this.recognizedObject = recognizedObject;
+    this.recognizedObjectAlert = true;
 
     setTimeout(() => {
         this.hideRecognizedObjectAlert();
@@ -207,10 +230,36 @@ export default class App extends Vue {
   }
 
   hideRecognizedObjectAlert() {
-      this.recognizedObjectAlert = false;
-      this.recognizedObject = "";
+    this.recognizedObjectAlert = false;
+    this.recognizedObject = "";
   }
 
+  showError(errorText: string) {
+    this.errorTextAlert = true;
+    this.errorText = errorText;
+
+    setTimeout(() => {
+      this.hideErrorAlert();
+    }, 3000);
+  }
+
+  hideErrorAlert() {
+    this.errorTextAlert = false;
+    this.errorText = "";
+  }
+
+  async disableDroneMotors() {
+    await this.signalRConnection.invoke("SendDisableDroneMotors");
+    this.$store.dispatch('resetActionCounter');
+  }
+
+  async resetDroneStopState() {
+    await this.signalRConnection.invoke("SendResetDroneStopState");
+  }
+
+  async stopAndLand() {
+    await this.signalRConnection.invoke("SendStopAndLand");
+  }
 }
 
 </script>

@@ -34,9 +34,26 @@ export class SignalRService {
             console.log('PerformActions');
             console.log(data);
 
-            await this._droneOperator.runActions(data);
+            var result = await this._droneOperator.runActions(data);
             console.log('finished on drone');
-            this._connection.invoke('DroneFinishedPerformingActions');
+            if(result) {
+                this._connection.invoke('DroneFinishedPerformingActions');
+            }
+            else {
+                this._connection.invoke('DroneFinishedPerformingActionsWithErrors');
+            }
+        });
+
+        this._connection.on('DisableDroneMotors', () => {
+            this._droneOperator.disableDroneMotors();
+        });
+
+        this._connection.on('ResetDroneStopState', () => {
+            this._droneOperator.emergencyStopReset();
+        });
+
+        this._connection.on('StopAndLand', () => {
+            this._droneOperator.forceLand();
         });
     }
 
