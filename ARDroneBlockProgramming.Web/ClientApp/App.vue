@@ -83,6 +83,14 @@
           bottom
           flat
           >
+          <v-btn flat slot="activator">Resetuj zatrzymanie drona</v-btn>
+          <span>Jeżeli zatrzymałeś drona, lub zatrzymałeś silniki - musisz przywrócić jego funkcjonalność.</span>
+        </v-tooltip>
+        <v-tooltip
+          close-delay="1000"
+          bottom
+          flat
+          >
           <v-btn flat slot="activator" class="red--text">Wyłącz napędy</v-btn>
           <span>W dowolnym momencie lotu, możesz wyłączyć napędy. UWAGA! Dron opadnie bezwładnie na ziemię. Może to spowodować jego uszkodzenie.</span>
         </v-tooltip>
