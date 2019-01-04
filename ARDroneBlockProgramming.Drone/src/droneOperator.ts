@@ -25,7 +25,7 @@ export class DroneOperator {
         });
 
         this._pngStream = this._client.getPngStream();
-        this._client.config('general:navdata_demo', 'FALSE', (data) => {
+        this._client.config('general:navdata_demo', 'FALSE', () => {
             console.log('general:navdata_demo callback');
         });
         this._udpControl = arDrone.createUdpControl();
