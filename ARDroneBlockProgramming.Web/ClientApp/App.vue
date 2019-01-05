@@ -47,29 +47,21 @@
       <v-toolbar-title class="main-title">ARDrone blokowe programowanie</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="white--text">
-        <v-tooltip class="restrictions-switch__container"
-          close-delay="1000"
-          bottom
-          flat
-          >
-          <v-switch
-            label="Tryb z ograniczeniami"
-            v-model="restrictionsSwitch"
-            slot="activator"
-          ></v-switch>
-          <span>
-            Tryb ten ogranicza zasięg (od miejsca wystartowania) drona do wartości zdefiniowanej po lewej stronie. 
-            Jeżeli w trakcie misji maszyna przekroczy te wartość - to misja zostanie przerwana i dron zawiśnie bezczynnie w powietrzu.
-          </span>
-        </v-tooltip>
         <v-tooltip
           close-delay="1000"
           bottom
           flat
           >
-          <v-text-field flat class="restrictions-distance__input" v-model="restrictionsInput" slot="activator" box></v-text-field>
-          <span>Odległość graniczna jakiej nie może dron przekroczyć (w metrach).</span>
+          <div slot="activator">
+            <v-text-field flat class="restrictions-distance__input" v-model="restrictionsInput" box></v-text-field>
+          </div>
+          <span>
+            Tryb ten ogranicza zasięg (od miejsca wystartowania) drona do zdefiniowanej wartości (podanej w metrach).
+            Jeżeli w trakcie misji maszyna przekroczy ją - to misja zostanie przerwana i dron zawiśnie bezczynnie w powietrzu.
+            Wartość 0 oznacza brak trybu.
+          </span>
         </v-tooltip>
+        <v-btn flat @click="setRestrictedMode()">Ustaw tryb organiczony</v-btn>
         <v-tooltip
           close-delay="1000"
           bottom
@@ -78,14 +70,14 @@
           <v-btn flat slot="activator" @click="stopAndLand()">Przerwij i wyląduj</v-btn>
           <span>W dowolnym momencie możesz przerwać misję. Dron natychmiast wyląduje na ziemi.</span>
         </v-tooltip>
-        <v-tooltip
+        <!-- <v-tooltip
           close-delay="1000"
           bottom
           flat
           >
           <v-btn flat slot="activator" @click="resetDroneStopState()">Resetuj zatrzymanie drona</v-btn>
           <span>Jeżeli zatrzymałeś drona, lub zatrzymałeś silniki - musisz przywrócić jego funkcjonalność.</span>
-        </v-tooltip>
+        </v-tooltip> -->
         <v-tooltip
           close-delay="1000"
           bottom
@@ -124,12 +116,20 @@
               {{ "Rozpoznano: " + recognizedObject }}
           </v-alert>
           <v-alert
-              :value="errorText"
+              :value="errorTextAlert"
               type="error"
               transition="scale-transition"
               class="custom-alert"
               >
               {{ errorText }}
+          </v-alert>
+          <v-alert
+              :value="confirmationAlert"
+              type="success"
+              transition="scale-transition"
+              class="custom-alert"
+              >
+              {{ confirmationText }}
           </v-alert>
         </v-layout>
       </v-container>
@@ -155,7 +155,6 @@ import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 })
 export default class App extends Vue {
   tagsInDroneRange: string[] = new Array();
-  restrictionsSwitch: boolean = false;
   restrictionsInput: number = 0;
 
   snackbar = false;
@@ -168,6 +167,9 @@ export default class App extends Vue {
 
   errorTextAlert: boolean = false;
   errorText: string = "";
+
+  confirmationText: string = "";
+  confirmationAlert: boolean = false;
 
   async created() {
     await this.initializeSignalRConnection();
@@ -218,6 +220,17 @@ export default class App extends Vue {
 
       this.showError("Misja przerwana! Pamiętaj o odblokowaniu drona przed kolejną.");
     });
+
+    this.signalRConnection.on('RestrictedModeConfirmation', (confirmationValue) => {
+      this.restrictionsInput = confirmationValue;
+      
+      if(confirmationValue !== 0) {
+        this.showConfirmationAlert(`Tryb restrykcji ustawiony na: ${confirmationValue} metrów`);
+      }
+      else {
+        this.showConfirmationAlert(`Wyłączono tryb restrykcji`);
+      }
+    });
   }
 
   showRecognizedObjectAlert(recognizedObject: string) {
@@ -234,18 +247,18 @@ export default class App extends Vue {
     this.recognizedObject = "";
   }
 
-  showError(errorText: string) {
-    this.errorTextAlert = true;
-    this.errorText = errorText;
+  showConfirmationAlert(confirmationText: string) {
+    this.confirmationAlert = true;
+    this.confirmationText = confirmationText;
 
     setTimeout(() => {
-      this.hideErrorAlert();
+      this.hideConfirmationAlert();
     }, 3000);
   }
 
-  hideErrorAlert() {
-    this.errorTextAlert = false;
-    this.errorText = "";
+  hideConfirmationAlert() {
+    this.confirmationAlert = false;
+    this.confirmationText = "";
   }
 
   async disableDroneMotors() {
@@ -259,6 +272,24 @@ export default class App extends Vue {
 
   async stopAndLand() {
     await this.signalRConnection.invoke("SendStopAndLand");
+  }
+
+  async setRestrictedMode() {
+    await this.signalRConnection.invoke("SendRestrictedModeDistance", this.restrictionsInput);
+  }
+
+  showError(errorText: string) {
+    this.errorTextAlert = true;
+    this.errorText = errorText;
+
+    setTimeout(() => {
+      this.hideErrorAlert();
+    }, 3000);
+  }
+
+  hideErrorAlert() {
+    this.errorTextAlert = false;
+    this.errorText = "";
   }
 }
 

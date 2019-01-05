@@ -17,6 +17,17 @@ export class DroneOperator {
     private droneStopped: boolean = false;
     private forcedLanding: boolean = false;
 
+    private restrictedMode: boolean = false;
+    private restrictedAreaInMeters: number = 0;
+
+    private restrictedModeWatchdog() {
+        setTimeout(() => {
+            if(this.restrictedMode) {
+                // TODO restrictions
+            }
+        }, 200);
+    }
+
     public constructor(
         private _hubConnection: HubConnection,
         droneIp: string = "192.168.1.1") 
@@ -383,5 +394,13 @@ export class DroneOperator {
     public async forceLand(): Promise<void> {
         await this.stop();
         this.forcedLanding = true;
+    }
+
+    public setRestrictedAreaInMeters(restrictions: number) {
+        this.restrictedAreaInMeters = restrictions;
+    }
+
+    public getRestrictionsMeters() {
+        return this.restrictedAreaInMeters;
     }
 }

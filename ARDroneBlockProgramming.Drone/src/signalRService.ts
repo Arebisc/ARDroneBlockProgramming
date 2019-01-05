@@ -21,6 +21,7 @@ export class SignalRService {
             
             this._droneOperator = new DroneOperator(this._connection);
             this.initDroneSendingNavdata();
+            await this._connection.invoke('SendRestrictedModeConfirmation', this._droneOperator.getRestrictionsMeters());
 
             console.log('Connection started');
         }
@@ -54,6 +55,11 @@ export class SignalRService {
 
         this._connection.on('StopAndLand', () => {
             this._droneOperator.forceLand();
+        });
+
+        this._connection.on('SetRestrictedModeDistance', async (restrictedArea) => {
+            this._droneOperator.setRestrictedAreaInMeters(restrictedArea);
+            await this._connection.invoke('SendRestrictedModeConfirmation', this._droneOperator.getRestrictionsMeters());
         });
     }
 

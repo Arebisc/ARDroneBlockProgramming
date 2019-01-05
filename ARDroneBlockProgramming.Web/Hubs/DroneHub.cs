@@ -59,5 +59,15 @@ namespace ARDroneBlockProgramming.Web.Hubs
         {
             await Clients.All.SendAsync("StopAndLand");
         }
+
+        public async Task SendRestrictedModeDistance(int distance)
+        {
+            await Clients.All.SendAsync("SetRestrictedModeDistance");
+        }
+
+        public async Task SendRestrictedModeConfirmation(int distance)
+        {
+            await Clients.All.SendAsync("RestrictedModeConfirmation");
+        }
     }
 }
