@@ -73,7 +73,12 @@ export class SignalRService {
     public async initDroneSendingNavdata() {
         setInterval(async () => {
             let navdata = await this._droneOperator.getNavdata();
-            await this._connection.invoke('NavdataFromDrone', navdata);
+            let dataToSend = {
+                kalmanPressure: navdata.kalmanPressure,
+            };
+            let stringifiedData = JSON.stringify(dataToSend);
+            
+            await this._connection.invoke('NavdataFromDrone', stringifiedData);
         }, 1000);
     }
 }

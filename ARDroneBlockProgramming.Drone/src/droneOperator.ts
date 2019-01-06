@@ -23,9 +23,9 @@ export class DroneOperator {
     private restrictedModeWatchdog() {
         setTimeout(() => {
             if(this.restrictedMode) {
-                // TODO restrictions
+                // 
             }
-        }, 200);
+        }, 400);
     }
 
     public constructor(
@@ -365,10 +365,6 @@ export class DroneOperator {
         this._udpControl.flush();
 
         this.droneStopped = false;
-    }
-
-    public breakActions() {
-
     }
 
     public async takePhoto(): Promise<object> {

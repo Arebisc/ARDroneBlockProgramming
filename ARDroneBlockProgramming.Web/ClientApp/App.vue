@@ -231,6 +231,11 @@ export default class App extends Vue {
         this.showConfirmationAlert(`Wyłączono tryb restrykcji`);
       }
     });
+
+    this.signalRConnection.on('DroneSendsNavdata', (navdataStringified: string) => {
+      let convertedToObject = JSON.parse(navdataStringified) as DroneNavData;
+      this.$store.dispatch('setNavdata', convertedToObject);
+    });
   }
 
   showRecognizedObjectAlert(recognizedObject: string) {
