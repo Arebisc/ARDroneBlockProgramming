@@ -20,6 +20,8 @@ export class DroneOperator {
     private restrictedMode: boolean = false;
     private restrictedAreaInMeters: number = 0;
 
+    private _lastNavdata: DroneNavData = null;
+
     private restrictedModeWatchdog() {
         setTimeout(() => {
             if(this.restrictedMode) {
@@ -42,6 +44,7 @@ export class DroneOperator {
         });
         this._udpControl = arDrone.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
+        this.initNavdataHandler();
     }
 
     public getNavdata():Promise<DroneNavData> {
@@ -50,6 +53,12 @@ export class DroneOperator {
             this._client.once('navdata', (data) => {
                 resolve(data);
             });
+        });
+    }
+
+    private initNavdataHandler() {
+        this._client.on('navdata', (navdata) => {
+            this._lastNavdata = navdata;
         });
     }
     
