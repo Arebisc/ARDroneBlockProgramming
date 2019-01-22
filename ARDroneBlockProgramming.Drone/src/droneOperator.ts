@@ -292,7 +292,11 @@ export class DroneOperator {
             this._client.land(() => {
                 console.log('after land');
             });
-            setTimeout(() => resolve(this._client), delay);
+            setTimeout(() => {
+                this.forcedLanding = false;
+                this.droneStopped = false;
+                resolve(this._client);
+            }, delay);
         });
     }
 
