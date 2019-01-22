@@ -1,4 +1,4 @@
-import { DroneNavData } from './../Helpers/DroneNavdata';
+import { DroneNavData, DroneEstimatedPosition } from './../Helpers/DroneNavdata';
 import { DroneAction } from './../classes/DroneAction';
 import { ActionTree } from 'vuex';
 import { ManagerState } from './ManagerState';
@@ -32,8 +32,8 @@ const actions: ActionTree<ManagerState, ManagerState> = {
         commit('RESET_ACTION_COUNTER');
     },
 
-    setNavdata({commit, state}, navdata: DroneNavData) {
-        commit('SET_NAVDATA', navdata);
+    setPosition({commit, state}, position: DroneEstimatedPosition) {
+        commit('SET_POSITION', position);
     }
 }
 

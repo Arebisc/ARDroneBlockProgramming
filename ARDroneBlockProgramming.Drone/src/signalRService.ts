@@ -20,7 +20,7 @@ export class SignalRService {
             this.initConnections();
             
             this._droneOperator = new DroneOperator(this._connection);
-            this.initDroneSendingNavdata();
+            this.initDroneSendingPosition();
             await this._connection.invoke('SendRestrictedModeConfirmation', this._droneOperator.getRestrictionsMeters());
 
             console.log('Connection started');
@@ -70,15 +70,12 @@ export class SignalRService {
         }, 2000);
     }
 
-    public async initDroneSendingNavdata() {
+    public async initDroneSendingPosition() {
         setInterval(async () => {
-            let navdata = await this._droneOperator.getLastNavdata();
-            let dataToSend = {
-                kalmanPressure: navdata.kalmanPressure,
-            };
-            let stringifiedData = JSON.stringify(dataToSend);
+            let position = await this._droneOperator.getPosition();
+            let stringifiedData = JSON.stringify(position);
             
-            await this._connection.invoke('NavdataFromDrone', stringifiedData);
+            await this._connection.invoke('PositionFromDrone', stringifiedData);
         }, 1000);
     }
 }

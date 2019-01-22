@@ -145,6 +145,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { mapGetters } from 'vuex';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+import { DroneEstimatedPosition } from './Helpers/DroneNavdata';
 
 @Component({
   computed: {
@@ -232,9 +233,10 @@ export default class App extends Vue {
       }
     });
 
-    this.signalRConnection.on('DroneSendsNavdata', (navdataStringified: string) => {
-      let convertedToObject = JSON.parse(navdataStringified) as DroneNavData;
-      this.$store.dispatch('setNavdata', convertedToObject);
+    this.signalRConnection.on('DroneSendsPosition', (positionStringified: string) => {
+      console.log('Received position: ' + positionStringified);
+      let convertedToObject = JSON.parse(positionStringified) as DroneEstimatedPosition;
+      this.$store.dispatch('setPosition', convertedToObject);
     });
   }
 

@@ -40,9 +40,9 @@ namespace ARDroneBlockProgramming.Web.Hubs
             await Clients.All.SendAsync("DroneFinishedAction");
         }
 
-        public async Task NavdataFromDrone(string droneNavdataStringifiedObject)
+        public async Task PositionFromDrone(string droneNavdataStringifiedObject)
         {
-            await Clients.All.SendAsync("DroneSendsNavdata", droneNavdataStringifiedObject);
+            await Clients.All.SendAsync("DroneSendsPosition", droneNavdataStringifiedObject);
         }
 
         public async Task SendDisableDroneMotors()

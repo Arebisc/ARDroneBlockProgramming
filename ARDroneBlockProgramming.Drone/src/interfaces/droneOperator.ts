@@ -1,3 +1,9 @@
+export interface DroneEstimatedPosition {
+    x: number;
+    y: number;
+    z: number;
+}
+
 export interface DroneNavData {
     header: number;
     droneState: DroneState;

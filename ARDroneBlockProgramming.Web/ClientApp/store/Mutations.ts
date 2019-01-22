@@ -15,8 +15,8 @@ const mutations: MutationTree<ManagerState> = {
         state.droneActionStateCounter = 0;
     },
 
-    SET_NAVDATA(state, payload) {
-        state.droneNavdata = payload;
+    SET_POSITION(state, payload) {
+        state.dronePosition = payload;
     }
 }
 

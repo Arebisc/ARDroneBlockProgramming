@@ -1,4 +1,4 @@
-import { DroneNavData } from './../Helpers/DroneNavdata';
+import { DroneNavData, DroneEstimatedPosition } from './../Helpers/DroneNavdata';
 import { DroneAction } from '../classes/DroneAction';
 
 
@@ -7,6 +7,9 @@ export class ManagerState {
     droneActions: Array<DroneAction> =  [];
     droneSees: string[] = [];
     droneActionStateCounter: number = 0;
-    // @ts-ignore
-    droneNavdata: DroneNavData = {};
+    dronePosition: DroneEstimatedPosition = {
+        x: 0,
+        y: 0,
+        z: 0
+    };
 }

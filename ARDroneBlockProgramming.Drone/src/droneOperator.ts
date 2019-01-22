@@ -3,7 +3,7 @@ import { DroneAction } from './classes/droneAction';
 import * as arDrone from 'ar-drone';
 import { ActionType } from './Types/ActionType';
 import { ComputerVision } from './computerVision';
-import { DroneNavData } from './interfaces/droneOperator';
+import { DroneNavData, DroneEstimatedPosition } from './interfaces/droneOperator';
 
 
 export class DroneOperator {
@@ -22,12 +22,22 @@ export class DroneOperator {
 
     private _lastNavdata: DroneNavData = null;
 
-    private restrictedModeWatchdog() {
-        setTimeout(() => {
-            if(this.restrictedMode) {
-                // 
+    private readonly M_PI = 3.14159265358979323846;
+    private _dronePosition: DroneEstimatedPosition;
+
+    private initRestrictedModeWatchdog() {
+        setInterval(() => {
+            if(!this.restrictedMode || !this._dronePosition) {
+                return;
             }
-        }, 400);
+
+            if(this._dronePosition.x >= this.restrictedAreaInMeters ||
+                this._dronePosition.y >= this.restrictedAreaInMeters ||
+                this._dronePosition.z >= this.restrictedAreaInMeters)
+            {
+                this.droneStopped = true;
+            }
+        }, 200);
     }
 
     public constructor(
@@ -46,7 +56,9 @@ export class DroneOperator {
 
         this._udpControl = arDrone.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
+
         this.initNavdataHandler();
+        this.initRestrictedModeWatchdog();
     }
 
     public getNavdata():Promise<DroneNavData> {
@@ -59,7 +71,8 @@ export class DroneOperator {
     }
 
     private initNavdataHandler() {
-        this._client.on('navdata', (navdata) => {
+        this._client.on('navdata', (navdata: DroneNavData) => {
+            this._dronePosition = this.calculatePosition(navdata);
             this._lastNavdata = navdata;
         });
     }
@@ -403,6 +416,14 @@ export class DroneOperator {
         this.forcedLanding = true;
     }
 
+    public resetForcedLand() {
+        this.forcedLanding = false;
+    }
+
+    public resetDroneStopped() {
+        this.droneStopped = false;
+    }
+
     public setRestrictedAreaInMeters(restrictions: number) {
         this.restrictedAreaInMeters = restrictions;
     }
@@ -413,5 +434,37 @@ export class DroneOperator {
 
     public getLastNavdata() {
         return this._lastNavdata;
+    }
+
+    private calculatePosition(droneNavdata: DroneNavData): DroneEstimatedPosition {
+        if(!this._lastNavdata) {
+            return;
+        }
+
+        if(!droneNavdata.references || !droneNavdata.demo) {
+            return;
+        }
+
+        const deltaT = (this._lastNavdata.time - this.getLastNavdata().time);
+
+        let positionX = ((Math.cos((droneNavdata.references.psi / 180000.0) * this.M_PI) *
+            droneNavdata.demo.xVelocity - Math.sin((droneNavdata.references.psi / 180000.0) * this.M_PI) *
+            -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
+
+        let positionY = ((Math.sin((droneNavdata.references.psi / 180000.0) * this.M_PI) *
+            droneNavdata.demo.xVelocity + Math.cos((droneNavdata.references.psi / 180000.0) * this.M_PI) *
+            -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
+
+        let positionZ = droneNavdata.demo.altitude / 1000.0;
+
+        return {
+            x: positionX,
+            y: positionY,
+            z: positionZ
+        }
+    }
+
+    public getPosition() {
+        return this._dronePosition;
     }
 }

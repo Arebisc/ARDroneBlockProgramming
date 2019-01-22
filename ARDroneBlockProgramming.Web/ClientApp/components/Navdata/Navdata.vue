@@ -6,56 +6,29 @@
                 <v-list dense>
                     <v-list-tile>
                         <v-list-tile-action>
-                            kalmanPressure.offsetPressure
+                            x
                         </v-list-tile-action>
                         <v-spacer></v-spacer>
                         <v-list-tile-content>
-                            {{ droneNavdata.kalmanPressure.offsetPressure }}
+                            {{ dronePosition.x }}
                         </v-list-tile-content>
                     </v-list-tile>
                     <v-list-tile>
                         <v-list-tile-action>
-                            kalmanPressure.estimated.velocity
+                            Y
                         </v-list-tile-action>
                         <v-spacer></v-spacer>
                         <v-list-tile-content>
-                            {{ droneNavdata.kalmanPressure.estimated.velocity }}
+                            {{ dronePosition.y }}
                         </v-list-tile-content>
                     </v-list-tile>
                     <v-list-tile>
                         <v-list-tile-action>
-                            kalmanPressure.estimated.covariance.alt
+                            z
                         </v-list-tile-action>
                         <v-spacer></v-spacer>
                         <v-list-tile-content>
-                            {{ droneNavdata.kalmanPressure.estimated.covariance.alt }}
-                        </v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-action>
-                            kalmanPressure.estimated.covariance.pwm
-                        </v-list-tile-action>
-                        <v-spacer></v-spacer>
-                        <v-list-tile-content>
-                            {{ droneNavdata.kalmanPressure.estimated.covariance.pwm }}
-                        </v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-action>
-                            kalmanPressure.estimated.covariance.velocity
-                        </v-list-tile-action>
-                        <v-spacer></v-spacer>
-                        <v-list-tile-content>
-                            {{ droneNavdata.kalmanPressure.estimated.covariance.velocity }}
-                        </v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-action>
-                            kalmanPressure.estimated.sum
-                        </v-list-tile-action>
-                        <v-spacer></v-spacer>
-                        <v-list-tile-content>
-                            {{ droneNavdata.kalmanPressure.estimated.sum }}
+                            {{  dronePosition.z }}
                         </v-list-tile-content>
                     </v-list-tile>
                 </v-list>
@@ -67,13 +40,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { DroneNavData } from '../../Helpers/DroneNavdata';
 import { mapGetters } from 'vuex';
 
 @Component({
     computed: {
         ...mapGetters({
-            droneNavdata: 'droneNavdata'
+            dronePosition: 'dronePosition'
         })
     }
 })
