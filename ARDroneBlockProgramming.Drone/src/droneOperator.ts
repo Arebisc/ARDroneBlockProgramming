@@ -451,12 +451,12 @@ export class DroneOperator {
 
         const deltaT = (this._lastNavdata.time - this.getLastNavdata().time);
 
-        let positionX = ((Math.cos((droneNavdata.references.psi / 180000.0) * this.M_PI) *
-            droneNavdata.demo.xVelocity - Math.sin((droneNavdata.references.psi / 180000.0) * this.M_PI) *
+        let positionX = ((Math.cos((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
+            droneNavdata.demo.xVelocity - Math.sin((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
             -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
 
-        let positionY = ((Math.sin((droneNavdata.references.psi / 180000.0) * this.M_PI) *
-            droneNavdata.demo.xVelocity + Math.cos((droneNavdata.references.psi / 180000.0) * this.M_PI) *
+        let positionY = ((Math.sin((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
+            droneNavdata.demo.xVelocity + Math.cos((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
             -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
 
         let positionZ = droneNavdata.demo.altitude / 1000.0;
