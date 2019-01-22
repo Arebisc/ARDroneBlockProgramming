@@ -72,7 +72,7 @@ export class SignalRService {
 
     public async initDroneSendingNavdata() {
         setInterval(async () => {
-            let navdata = await this._droneOperator.getNavdata();
+            let navdata = await this._droneOperator.getLastNavdata();
             let dataToSend = {
                 kalmanPressure: navdata.kalmanPressure,
             };
