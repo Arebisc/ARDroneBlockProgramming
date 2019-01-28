@@ -16,14 +16,14 @@
           </v-list-tile-content>
         </v-list-tile>
 
-        <v-list-tile @click="$router.push({ name: 'navdata' })" class="router-link">
+        <!-- <v-list-tile @click="$router.push({ name: 'navdata' })" class="router-link">
           <v-list-tile-action>
             <v-icon>gps_fixed</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             Dane nawigacyjne:
           </v-list-tile-content>
-        </v-list-tile>
+        </v-list-tile> -->
 
         <v-list-tile>
           <v-list-tile-action>
@@ -47,7 +47,7 @@
       <v-toolbar-title class="main-title">ARDrone blokowe programowanie</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="white--text">
-        <v-tooltip
+        <!-- <v-tooltip
           close-delay="1000"
           bottom
           flat
@@ -69,7 +69,7 @@
           >
           <v-btn flat slot="activator" @click="stopAndLand()">Przerwij i wyląduj</v-btn>
           <span>W dowolnym momencie możesz przerwać misję. Dron natychmiast wyląduje na ziemi.</span>
-        </v-tooltip>
+        </v-tooltip> -->
         <!-- <v-tooltip
           close-delay="1000"
           bottom
@@ -223,14 +223,14 @@ export default class App extends Vue {
     });
 
     this.signalRConnection.on('RestrictedModeConfirmation', (confirmationValue) => {
-      this.restrictionsInput = confirmationValue;
+      // this.restrictionsInput = confirmationValue;
       
-      if(confirmationValue !== 0) {
-        this.showConfirmationAlert(`Tryb restrykcji ustawiony na: ${confirmationValue} metrów`);
-      }
-      else {
-        this.showConfirmationAlert(`Wyłączono tryb restrykcji`);
-      }
+      // if(confirmationValue !== 0) {
+      //   this.showConfirmationAlert(`Tryb restrykcji ustawiony na: ${confirmationValue}m`);
+      // }
+      // else {
+      //   this.showConfirmationAlert(`Wyłączono tryb restrykcji`);
+      // }
     });
 
     this.signalRConnection.on('DroneSendsPosition', (positionStringified: string) => {

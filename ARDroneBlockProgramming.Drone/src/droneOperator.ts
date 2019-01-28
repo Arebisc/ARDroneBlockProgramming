@@ -23,7 +23,11 @@ export class DroneOperator {
     private _lastNavdata: DroneNavData = null;
 
     private readonly M_PI = 3.14159265358979323846;
-    private _dronePosition: DroneEstimatedPosition;
+    private _dronePosition: DroneEstimatedPosition = {
+        x: 0,
+        y: 0,
+        z: 0
+    };
 
     private initRestrictedModeWatchdog() {
         setInterval(() => {
@@ -57,8 +61,8 @@ export class DroneOperator {
         this._udpControl = arDrone.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
 
-        this.initNavdataHandler();
-        this.initRestrictedModeWatchdog();
+        // this.initNavdataHandler();
+        // this.initRestrictedModeWatchdog();
     }
 
     public getNavdata():Promise<DroneNavData> {
@@ -71,10 +75,10 @@ export class DroneOperator {
     }
 
     private initNavdataHandler() {
-        this._client.on('navdata', (navdata: DroneNavData) => {
-            this._dronePosition = this.calculatePosition(navdata);
-            this._lastNavdata = navdata;
-        });
+        // this._client.on('navdata', (navdata: DroneNavData) => {
+        //     this._dronePosition = this.calculatePosition(navdata);
+        //     this._lastNavdata = navdata;
+        // });
     }
     
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
@@ -107,8 +111,11 @@ export class DroneOperator {
             await this.stop();
         }
         console.log('outside actions foreach');
-        await this.land();
 
+        if(!this.forcedLanding) {
+            await this.land();
+        }
+        
         return true;
     }
 
@@ -276,7 +283,7 @@ export class DroneOperator {
         });
     }
 
-    private async takeOff(delay: number = 3000): Promise<arDrone.Client> {
+    private async takeOff(delay: number = 6000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('takeoff');
             this._client.takeoff(() => {
@@ -441,15 +448,11 @@ export class DroneOperator {
     }
 
     private calculatePosition(droneNavdata: DroneNavData): DroneEstimatedPosition {
-        if(!this._lastNavdata) {
+        if(!this._lastNavdata || !droneNavdata.demo) {
             return;
         }
 
-        if(!droneNavdata.references || !droneNavdata.demo) {
-            return;
-        }
-
-        const deltaT = (this._lastNavdata.time - this.getLastNavdata().time);
+        const deltaT = (droneNavdata.time - this.getLastNavdata().time);
 
         let positionX = ((Math.cos((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
             droneNavdata.demo.xVelocity - Math.sin((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
@@ -460,6 +463,17 @@ export class DroneOperator {
             -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
 
         let positionZ = droneNavdata.demo.altitude / 1000.0;
+
+        if(droneNavdata.demo.xVelocity || droneNavdata.demo.xVelocity) {
+            // console.log(`x: ${droneNavdata.demo.xVelocity}; y: ${droneNavdata.demo.yVelocity}; psi:${droneNavdata.demo.rotation.psi};`);
+            // console.log(`x: ${positionX}; y: ${positionY}; z:${positionZ};`);
+            console.log(`time: ${droneNavdata.time}; timerElapsed: ${droneNavdata.droneState.timerElapsed}; curve.time:${droneNavdata.rawMeasures.us.curve.time};`);
+            console.log(deltaT);
+        } 
+
+        if(positionX == null || positionY == null || positionZ == null) {
+            console.log(`null in calculatePosition ${positionX} ${positionY} ${positionZ}`);
+        }
 
         return {
             x: positionX,

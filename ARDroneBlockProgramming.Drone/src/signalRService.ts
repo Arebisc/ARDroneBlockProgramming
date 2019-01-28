@@ -20,7 +20,7 @@ export class SignalRService {
             this.initConnections();
             
             this._droneOperator = new DroneOperator(this._connection);
-            this.initDroneSendingPosition();
+            // this.initDroneSendingPosition();
             await this._connection.invoke('SendRestrictedModeConfirmation', this._droneOperator.getRestrictionsMeters());
 
             console.log('Connection started');
@@ -73,6 +73,9 @@ export class SignalRService {
     public async initDroneSendingPosition() {
         setInterval(async () => {
             let position = await this._droneOperator.getPosition();
+            if(position == null) {
+                console.log('null in initDroneSendingPosition');
+            }
             let stringifiedData = JSON.stringify(position);
             
             await this._connection.invoke('PositionFromDrone', stringifiedData);
