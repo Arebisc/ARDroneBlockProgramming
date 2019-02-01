@@ -1,4 +1,5 @@
-﻿using ARDroneBlockProgramming.Web.ViewModels;
+﻿using ARDroneBlockProgramming.Web.DroneNavdataHelpers;
+using ARDroneBlockProgramming.Web.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -19,9 +20,54 @@ namespace ARDroneBlockProgramming.Web.Hubs
             await Clients.All.SendAsync("SendDroneFinishedActionsToClient");
         }
 
+        public async Task DroneFinishedPerformingActionsWithErrors()
+        {
+            await Clients.All.SendAsync("SendDroneFinishedActionsWithErrorsToClient");
+        }
+
         public async Task TagsRecognizedByDrone(string[] tags)
         {
             await Clients.All.SendAsync("DroneRecognizedTagsToClient", tags);
+        }
+
+        public async Task DroneRecognizedObjectFromAction(string recognizedObject)
+        {
+            await Clients.All.SendAsync("AlertRecognizedObject", recognizedObject);
+        }
+
+        public async Task DroneFinishedOneAction()
+        {
+            await Clients.All.SendAsync("DroneFinishedAction");
+        }
+
+        public async Task PositionFromDrone(string droneNavdataStringifiedObject)
+        {
+            await Clients.All.SendAsync("DroneSendsPosition", droneNavdataStringifiedObject);
+        }
+
+        public async Task SendDisableDroneMotors()
+        {
+            await Clients.All.SendAsync("DisableDroneMotors");
+        }
+
+        public async Task SendResetDroneStopState()
+        {
+            await Clients.All.SendAsync("ResetDroneStopState");
+        }
+
+        public async Task SendStopAndLand()
+        {
+            await Clients.All.SendAsync("StopAndLand");
+        }
+
+        public async Task SendRestrictedModeDistance(int distance)
+        {
+            await Clients.All.SendAsync("SetRestrictedModeDistance", distance);
+        }
+
+        public async Task SendRestrictedModeConfirmation(int distance)
+        {
+            await Clients.All.SendAsync("RestrictedModeConfirmation", distance);
         }
     }
 }

@@ -1,31 +1,84 @@
+import { HubConnection } from '@aspnet/signalr';
 import { DroneAction } from './classes/droneAction';
 import * as arDrone from 'ar-drone';
 import { ActionType } from './Types/ActionType';
 import { ComputerVision } from './computerVision';
-import { DroneNavData } from './interfaces/droneOperator';
+import { DroneNavData, DroneEstimatedPosition } from './interfaces/droneOperator';
 
 
 export class DroneOperator {
     private _client: arDrone.Client;
     private _pngStream: arDrone.PngStream;
     private _computerVision: ComputerVision;
+    private _udpControl: arDrone.UdpControl;
 
-    public constructor(droneIp: string = "192.168.1.1") {
+    private EMERGENCY_BIT_POSITION: number = 8;
+    
+    private droneStopped: boolean = false;
+    private forcedLanding: boolean = false;
+
+    private restrictedMode: boolean = false;
+    private restrictedAreaInMeters: number = 0;
+
+    private _lastNavdata: DroneNavData = null;
+
+    private readonly M_PI = 3.14159265358979323846;
+    private _dronePosition: DroneEstimatedPosition = {
+        x: 0,
+        y: 0,
+        z: 0
+    };
+
+    private initRestrictedModeWatchdog() {
+        setInterval(() => {
+            if(!this.restrictedMode || !this._dronePosition) {
+                return;
+            }
+
+            if(this._dronePosition.x >= this.restrictedAreaInMeters ||
+                this._dronePosition.y >= this.restrictedAreaInMeters ||
+                this._dronePosition.z >= this.restrictedAreaInMeters)
+            {
+                this.droneStopped = true;
+            }
+        }, 200);
+    }
+
+    public constructor(
+        private _hubConnection: HubConnection,
+        droneIp: string = "192.168.1.1") 
+        {
         this._client = arDrone.createClient({
             ip: droneIp,
         });
 
         this._pngStream = this._client.getPngStream();
+
+        this._client.config('general:navdata_demo', 'FALSE', () => {
+            console.log('general:navdata_demo callback');
+        });
+
+        this._udpControl = arDrone.createUdpControl();
         this._computerVision = new ComputerVision("url here", "key here");
+
+        // this.initNavdataHandler();
+        // this.initRestrictedModeWatchdog();
     }
 
     public getNavdata():Promise<DroneNavData> {
         return new Promise((resolve, reject) => {
-            this._client.once('navdata', console.log);
+            // this._client.once('navdata', console.log);
             this._client.once('navdata', (data) => {
                 resolve(data);
             });
         });
+    }
+
+    private initNavdataHandler() {
+        // this._client.on('navdata', (navdata: DroneNavData) => {
+        //     this._dronePosition = this.calculatePosition(navdata);
+        //     this._lastNavdata = navdata;
+        // });
     }
     
     public async runActions(droneActions: DroneAction[]): Promise<boolean> {
@@ -33,22 +86,47 @@ export class DroneOperator {
         await this.takeOff();
         await this.stop();
 
-        return new Promise<boolean>(async (resolve, reject) => {
-            console.log('droneActions: ' + droneActions.length);
-            
-            for (let i: number = 0; i < droneActions.length; i++ ) {
-                await this.runAction(droneActions[i]);
-                await this.stop();
-            }
-            console.log('outside actions foreach');
-            await this.land();
+        console.log('droneActions: ' + droneActions.length);
+        
+        for (let i: number = 0; i < droneActions.length; i++ ) {
 
-            resolve(true);
-        });
+            if(this.forcedLanding) {
+                this.forcedLanding = false;
+                console.log('Loop breaked before run action');
+                break;
+            }
+
+            var result = await this.runAction(droneActions[i]);
+            
+            if(result !== true ) {
+                return false;
+            }
+
+            if(this.forcedLanding) {
+                this.forcedLanding = false;
+                console.log('Loop breaked after run action');
+                break;
+            }
+
+            await this.stop();
+        }
+        console.log('outside actions foreach');
+
+        if(!this.forcedLanding) {
+            await this.land();
+        }
+        
+        return true;
     }
 
-    private async runAction(action: DroneAction) {
+    private async runAction(action: DroneAction): Promise<boolean> {
         console.log('inside run action');
+
+        if(this.isDroneStopped()) {
+            return false;
+        }
+
+        this.actionCompletedAlert();
         
         switch(action.actionType) {
             case ActionType.Forward:
@@ -195,7 +273,7 @@ export class DroneOperator {
         });
     }
 
-    private async stop() : Promise<arDrone.Client> {
+    private async stop(): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('stop');
             this._client.stop();
@@ -205,22 +283,27 @@ export class DroneOperator {
         });
     }
 
-    private async takeOff(delay: number = 3000): Promise<arDrone.Client> {
+    private async takeOff(delay: number = 6000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('takeoff');
             this._client.takeoff(() => {
                 console.log('aftertk');
             });
-            setTimeout(resolve(this._client), delay);
+            setTimeout(() => resolve(this._client), delay);
         });
     }
 
-    private async land(): Promise<arDrone.Client> {
+    private async land(delay: number = 3000): Promise<arDrone.Client> {
         return new Promise<arDrone.Client>((resolve, reject) => {
             console.log('land');
             this._client.land(() => {
-                resolve(this._client);
+                console.log('after land');
             });
+            setTimeout(() => {
+                this.forcedLanding = false;
+                this.droneStopped = false;
+                resolve(this._client);
+            }, delay);
         });
     }
 
@@ -235,39 +318,54 @@ export class DroneOperator {
     }
 
     private async turningLeftTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>(async (resolve, reject) => {
-            let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+        if(!droneAction.tag) {
+            console.log('No tag provided. Skipping action.');
+            return this._client;
+        }
 
-            while(!anyTagRecognized) {
-                await this.turnLeft(droneAction);
-                await this.stop();
-                await this.wait(1000);
+        let tagsInDroneRange = await this.getTagsInDroneRange();
+        let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-                tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        while(!anyTagRecognized) {
+
+            if(this.forcedLanding) {
+                return this._client;
             }
 
-            resolve(this._client);
-        });
+            await this.turnLeft(droneAction);
+            await this.stop();
+            await this.wait(1000);
+
+            tagsInDroneRange = await this.getTagsInDroneRange();
+            anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        }
+
+        return this._client;
     }
 
     private async turningRightTillRecognizedObject(droneAction: DroneAction) :Promise<arDrone.Client> {
-        return new Promise<arDrone.Client>(async (resolve, reject) => {
-            let tagsInDroneRange = await this.getTagsInDroneRange();
-            let anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange);
+        let tagsInDroneRange = await this.getTagsInDroneRange();
+        let anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange);
 
-            while(!anyTagRecognized) {
-                await this.turnRight(droneAction);
-                await this.stop();
-                await this.wait(1000);
+        if(!droneAction.tag) {
+            console.log('No tag provided. Skipping action.');
+            return this._client;
+        }
 
-                tagsInDroneRange = await this.getTagsInDroneRange();
-                anyTagRecognized = this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        while(!anyTagRecognized) {
+            if(this.forcedLanding) {
+                return this._client;
             }
 
-            resolve(this._client);
-        });
+            await this.turnRight(droneAction);
+            await this.stop();
+            await this.wait(1000);
+
+            tagsInDroneRange = await this.getTagsInDroneRange();
+            anyTagRecognized = await this.tagRecognized(droneAction.tag, tagsInDroneRange)
+        }
+
+        return this._client;
     }
 
     public async getTagsInDroneRange() {
@@ -277,21 +375,114 @@ export class DroneOperator {
         return tagsReceived;
     }
 
-    private tagRecognized(tagToRecognize: string, tagsReceived: string[]): boolean {
+    private async tagRecognized(tagToRecognize: string, tagsReceived: string[]): Promise<boolean> {
         console.log(tagsReceived);
         if(tagsReceived.includes(tagToRecognize)){
             console.log('Recognized: ', tagToRecognize);
+            await this.recognizedObjectAlert(tagToRecognize);
             return true;
         }
         
         return false;
     }
 
-    public async takePhoto() :Promise<object> {
+    public disableDroneMotors() {
+        console.log('Disable drone motors');
+        this._udpControl.raw("REF", (1 << this.EMERGENCY_BIT_POSITION));
+        this._udpControl.flush();
+
+        this.droneStopped = true;
+    }
+
+    public emergencyStopReset() {
+        console.log('Emergency stop reset');
+        this._udpControl.raw("REF", (0 << this.EMERGENCY_BIT_POSITION));
+        this._udpControl.flush();
+
+        this.droneStopped = false;
+    }
+
+    public async takePhoto(): Promise<object> {
         return new Promise<object>((resolve, reject) => {
             this._pngStream.once('data', function (data) {
                 resolve(data);
             });
         });
+    }
+
+    private async recognizedObjectAlert(objectName: string) {
+        await this._hubConnection.invoke('DroneRecognizedObjectFromAction', objectName);
+    }
+
+    private async actionCompletedAlert() {
+        await this._hubConnection.invoke('DroneFinishedOneAction');
+    }
+
+    private isDroneStopped(): boolean {
+        return this.droneStopped == true;
+    }
+
+    public async forceLand(): Promise<void> {
+        await this.stop();
+        this.forcedLanding = true;
+    }
+
+    public resetForcedLand() {
+        this.forcedLanding = false;
+    }
+
+    public resetDroneStopped() {
+        this.droneStopped = false;
+    }
+
+    public setRestrictedAreaInMeters(restrictions: number) {
+        this.restrictedAreaInMeters = restrictions;
+    }
+
+    public getRestrictionsMeters() {
+        return this.restrictedAreaInMeters;
+    }
+
+    public getLastNavdata() {
+        return this._lastNavdata;
+    }
+
+    private calculatePosition(droneNavdata: DroneNavData): DroneEstimatedPosition {
+        if(!this._lastNavdata || !droneNavdata.demo) {
+            return;
+        }
+
+        const deltaT = (droneNavdata.time - this.getLastNavdata().time);
+
+        let positionX = ((Math.cos((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
+            droneNavdata.demo.xVelocity - Math.sin((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
+            -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
+
+        let positionY = ((Math.sin((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
+            droneNavdata.demo.xVelocity + Math.cos((droneNavdata.demo.rotation.psi / 180000.0) * this.M_PI) *
+            -droneNavdata.demo.yVelocity) * deltaT) / 1000.0;
+
+        let positionZ = droneNavdata.demo.altitude / 1000.0;
+
+        if(droneNavdata.demo.xVelocity || droneNavdata.demo.xVelocity) {
+            // console.log(`x: ${droneNavdata.demo.xVelocity}; y: ${droneNavdata.demo.yVelocity}; psi:${droneNavdata.demo.rotation.psi};`);
+            // console.log(`x: ${positionX}; y: ${positionY}; z:${positionZ};`);
+            console.log(`time: ${droneNavdata.time}; timerElapsed: ${droneNavdata.droneState.timerElapsed}; curve.time:${droneNavdata.rawMeasures.us.curve.time};`);
+            console.log(deltaT);
+        } 
+
+        if(positionX == null || positionY == null || positionZ == null) {
+            console.log(`null in calculatePosition ${positionX} ${positionY} ${positionZ}`);
+        }
+
+        return {
+            x: positionX,
+            y: positionY,
+            z: positionZ
+        }
+    }
+
+    public getPosition() {
+        return this._dronePosition;
     }
 }

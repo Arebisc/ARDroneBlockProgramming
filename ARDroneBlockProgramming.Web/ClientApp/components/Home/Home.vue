@@ -18,38 +18,27 @@
                     :key="index"
                     :droneAction="element"
                     :index="index"
-                    :arrayContaining="userSelectedActions">
+                    :arrayContaining="userSelectedActions"
+                >
                 </action-tile>
             </draggable>
             <h3>Koniec</h3>
             <p class="actions-info-text">Umieszczaj akcje powyżej</p>
             <v-btn type="button" @click="sendActions" color="info">Wykonaj akcje</v-btn>
         </v-flex>
-        <v-snackbar
-            v-model="snackbar"
-            bottom
-        >
-            {{ snackbarText }}
-            <v-btn
-            color="pink"
-            flat
-            @click="snackbar = false; snackbarText=''"
-            >
-            Close
-            </v-btn>
-      </v-snackbar>
     </v-layout>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+// @ts-ignore
 import draggable from 'vuedraggable';
 import { DroneAction } from '../../classes/DroneAction';
 import ActionTileComponent from './ActionTile.vue';
 import { ActionType } from './../../types/ActionType';
 import { AxiosResponse } from 'axios';
-import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+import { HubConnection } from '@aspnet/signalr';
 
 
 @Component({
@@ -59,6 +48,9 @@ import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
     }
 })
 export default class Home extends Vue {
+    // @ts-ignore
+    @Prop(HubConnection) signalRConnection!: HubConnection;
+
     actionsContainerOptions = {
         group: {
             name: 'drone-actions-group',
@@ -67,9 +59,6 @@ export default class Home extends Vue {
         },
         sort: false
     };
-
-    snackbar = false;
-    snackbarText = "";
 
     droneActions: DroneAction[] = [
         new DroneAction('Do góry', ActionType.Up),
@@ -82,31 +71,6 @@ export default class Home extends Vue {
         new DroneAction('Obracaj w lewo póki nie napotkasz: ', ActionType.TurnLeftTillRecognize)
     ];
     userSelectedActions: DroneAction[] = [];
-
-    signalRConnection!: HubConnection;
-
-
-    async created() {
-        await this.initializeSignalRConnection();
-    }
-
-    async initializeSignalRConnection() {
-        this.signalRConnection = new HubConnectionBuilder()
-            .withUrl('/droneHub')
-            .build();
-
-        this.signalRConnection.on('SendDroneFinishedActionsToClient', () => {
-            this.snackbarText = "Dron zakończył wykonywanie poleceń";
-            this.snackbar = true;
-        });
-
-        this.signalRConnection.on('DroneRecognizedTagsToClient', (tags) => {
-            console.log(tags);
-            this.$store.dispatch('setTagsWhichDroneSees', tags);
-        });
-
-        await this.signalRConnection.start();
-    }
 
     customClone(originalAction: DroneAction): DroneAction {
         return new DroneAction(originalAction.actionLabel, originalAction.actionType, originalAction.speed, originalAction.duration);

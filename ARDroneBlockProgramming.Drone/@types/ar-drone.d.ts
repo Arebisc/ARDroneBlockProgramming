@@ -33,7 +33,7 @@ declare module 'ar-drone' {
 
         clockwise(speed: any): any;
 
-        config(key: any, value: any, callback: any): void;
+        config(key: any, value: any, callback?: any): void;
 
         counterClockwise(speed: any): any;
 
@@ -127,7 +127,7 @@ declare module 'ar-drone' {
 
     export function createPngStream(options: any): any;
 
-    export function createUdpControl(options: any): UdpControl;
+    export function createUdpControl(options?: any): UdpControl;
 
     export function createUdpNavdataStream(options: any): any;
 

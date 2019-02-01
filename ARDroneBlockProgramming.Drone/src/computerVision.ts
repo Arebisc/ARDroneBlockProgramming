@@ -13,7 +13,9 @@ export class ComputerVision {
 
         try {
             let apiResponse = await this.postImage(image) as IApiJsonResponse;
-            tags = apiRsponse.tags.filter(n => n.confidence > predictionThreshold);
+            tags = apiResponse.tags
+                .filter(n => n.confidence > predictionThreshold)
+                .map(x => x.name);
         }
         catch(e) {
             console.log(e);

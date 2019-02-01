@@ -5,7 +5,7 @@
                 {{ droneAction.actionLabel }}
             </v-flex>
         </v-layout>
-        <v-layout row wrap class="action-tile" v-if="arrayContaining != null">
+        <v-layout row wrap class="action-tile" :class="index === (droneActionStateCounter - 1) ? 'active' : ''" v-if="arrayContaining != null">
             <v-flex xs3>
                 {{ droneAction.actionLabel }}
             </v-flex>
@@ -42,9 +42,16 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { DroneAction } from '../../classes/DroneAction';
 import { ActionType } from '../../types/ActionType';
+import { mapGetters } from 'vuex';
 
 
-@Component
+@Component({
+  computed: {
+    ...mapGetters({
+      droneActionStateCounter: 'droneActionStateCounter'
+    })
+  }
+})
 export default class Home extends Vue {
     @Prop(DroneAction) droneAction!: DroneAction;
     @Prop(Number) index!: number;
@@ -107,5 +114,9 @@ export default class Home extends Vue {
 
 .searching-element-input {
     width: 100%;
+}
+
+.active {
+    background: #A1CE42;
 }
 </style>
